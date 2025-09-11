@@ -1,0 +1,2 @@
+1.composer require farhanwazir/laravelgooglemaps:dev-master
+2.config/app.php in  FarhanWazir\GoogleMaps\GMapsServiceProvider::class,
