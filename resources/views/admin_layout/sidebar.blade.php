@@ -67,7 +67,7 @@
             </a>
           </li>
 
-          <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['product', 'product.create', 'product.edit']) ? 'menuitem-active' : '' }}">
+          <!-- <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['product', 'product.create', 'product.edit']) ? 'menuitem-active' : '' }}">
             <a href="{{route('product')}}" class="side-nav-link">
               <i class="ri-shopping-bag-line"></i>
               <span> Product </span>
@@ -79,7 +79,7 @@
               <i class="ri-calendar-2-fill"></i>
               <span> Profile </span>
             </a>
-          </li>
+          </li> -->
 
         </ul>
         <!--- End Sidemenu -->
