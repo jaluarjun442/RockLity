@@ -8,7 +8,7 @@
       <div class="card-body card-body-breadcums">
         <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
           <h4 class="page-title">{{ ucfirst($moduleName) }}</h4>
-          <a href="{{ route('category.create') }}" class="btn btn-success">
+          <a href="{{ route('category.create') }}" class="btn btn-success mb-2">
             <i class="ri-add-line"></i> Add {{ ucfirst($moduleName) }}
           </a>
         </div>
@@ -52,6 +52,8 @@
 <script>
   var table = $('#datatable').DataTable({
     keys: !0,
+    scrollX: true,
+    "pagingType": "simple_numbers",
     language: {
       paginate: {
         previous: "<i class='ri-arrow-left-s-line'>",
@@ -87,18 +89,6 @@
         searchable: false,
       },
     ]
-  });
-  $("#basic-datatable").DataTable({
-    keys: !0,
-    language: {
-      paginate: {
-        previous: "<i class='ri-arrow-left-s-line'>",
-        next: "<i class='ri-arrow-right-s-line'>"
-      }
-    },
-    drawCallback: function() {
-      $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
-    },
   });
 </script>
 @endsection

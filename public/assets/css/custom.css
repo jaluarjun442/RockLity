@@ -42,3 +42,12 @@ tr {
     padding: 0px 20px 0px 20px;
     color: var(--ct-card-color);
 }
+
+.dataTables_wrapper .dataTables_paginate .pagination {
+    flex-wrap: wrap !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    display: inline-block !important;
+    min-width: 30px;
+}
