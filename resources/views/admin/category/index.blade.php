@@ -32,15 +32,6 @@
           </thead>
           <tbody>
           </tbody>
-          <!-- <tfoot>
-            <tr>
-              <th>Sr No.</th>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </tfoot> -->
         </table>
       </div>
     </div>

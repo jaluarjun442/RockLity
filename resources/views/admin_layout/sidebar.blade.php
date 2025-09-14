@@ -43,9 +43,9 @@
               <span class="fw-semibold fs-15 d-block">{{ Auth::user()->name }}</span>
               <span class="fs-13">{{Helper::settings()->name}}</span>
             </div>
-            <div class="ms-auto">
+            <!-- <div class="ms-auto">
               <i class="ri-arrow-right-s-fill fs-20"></i>
-            </div>
+            </div> -->
           </a>
         </div>
 
@@ -56,7 +56,7 @@
 
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.index']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.index')}}" class="side-nav-link {{ in_array(Route::currentRouteName(), ['admin.index']) ? 'active' : '' }}">
-              <i class="ri-dashboard-2-fill"></i>
+              <i class="ri-apps-line"></i>
               <span> Dashboard </span>
             </a>
           </li>
@@ -73,7 +73,12 @@
               <span> Product </span>
             </a>
           </li>
-
+          <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['customer', 'customer.create', 'customer.edit']) ? 'menuitem-active' : '' }}">
+            <a href="{{route('customer')}}" class="side-nav-link">
+              <i class="ri-group-line"></i>
+              <span> Customer </span>
+            </a>
+          </li>
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.profile']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.profile')}}" class="side-nav-link">
               <i class="ri-user-line"></i>

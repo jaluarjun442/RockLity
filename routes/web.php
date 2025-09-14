@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\admin\QuestionController;
-use App\Http\Controllers\admin\SitemapController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\admin\ProfileController;
-use App\Http\Controllers\admin\KeywordController;
 use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\CustomerController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\SettingsController;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -45,7 +43,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
         Route::put('/update/{id}', [CategoryController::class, 'update'])->name('category.update');
         Route::get('/delete/{id}', [CategoryController::class, 'delete'])->name('category.delete');
-        Route::get('/changeStatus/{id}', [CategoryController::class, 'changeStatus'])->name('category.changeStatus');
     });
     Route::group(['prefix' => 'product'], function () {
         //product routes
@@ -56,8 +53,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
         Route::put('/update/{id}', [ProductController::class, 'update'])->name('product.update');
         Route::get('/delete/{id}', [ProductController::class, 'delete'])->name('product.delete');
-        Route::get('/changeStatus/{id}', [ProductController::class, 'changeStatus'])->name('product.changeStatus');
     });
+
+    Route::group(['prefix' => 'customer'], function () {
+        //customer routes
+        Route::get('/', [CustomerController::class, 'index'])->name('customer');
+        Route::get('/getCustomerData', [CustomerController::class, 'getData'])->name('getCustomerData');
+        Route::get('/create', [CustomerController::class, 'create'])->name('customer.create');
+        Route::post('/store', [CustomerController::class, 'store'])->name('customer.store');
+        Route::get('/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit');
+        Route::put('/update/{id}', [CustomerController::class, 'update'])->name('customer.update');
+        Route::get('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
+    });
+
     //Profile routes
     Route::get('profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::put('profile-update/{id}', [ProfileController::class, 'update'])->name('admin.profile.update');

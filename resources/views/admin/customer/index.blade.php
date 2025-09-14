@@ -8,7 +8,7 @@
       <div class="card-body card-body-breadcums">
         <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
           <h4 class="page-title">{{ ucfirst($moduleName) }}</h4>
-          <a href="{{ route('product.create') }}" class="btn btn-success mb-2">
+          <a href="{{ route('customer.create') }}" class="btn btn-success mb-2">
             <i class="ri-add-line"></i> Add {{ ucfirst($moduleName) }}
           </a>
         </div>
@@ -23,31 +23,14 @@
         <table id="datatable" class="table table-striped dt-responsive nowrap w-100">
           <thead>
             <tr>
-              <!-- <th>Id</th> -->
-              <!-- <th>Image</th> -->
-              <th>Sku</th>
               <th>Name</th>
-              <th>Price</th>
-              <th>Status</th>
+              <th>Mobile</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header py-2">
-        <h6 class="modal-title" id="imageModalLabel">Product Image</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center p-2">
-        <img id="modalImage" src="" class="img-fluid rounded shadow-sm" alt="Product Image" style="max-height:250px;">
       </div>
     </div>
   </div>
@@ -71,7 +54,7 @@
     },
     processing: true,
     serverSide: true,
-    ajax: "{{ route('getProductData') }}",
+    ajax: "{{ route('getCustomerData') }}",
     columns: [
       // {
       //   data: 'id',
@@ -82,20 +65,12 @@
       //   name: 'image'
       // },
       {
-        data: 'sku',
-        name: 'sku'
-      },
-      {
         data: 'name',
         name: 'name'
       },
       {
-        data: 'price',
-        name: 'price'
-      },
-      {
-        data: 'status',
-        name: 'status'
+        data: 'mobile',
+        name: 'mobile'
       },
       {
         data: 'action',
@@ -104,11 +79,6 @@
         searchable: false,
       },
     ]
-  });
-  $(document).on('click', '.view-image-btn', function() {
-    let imageUrl = $(this).data('image_url');
-    $('#modalImage').attr('src', imageUrl);
-    $('#imageModal').modal('show');
   });
 </script>
 @endsection

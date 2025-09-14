@@ -137,13 +137,13 @@
           </div>
 
           <!-- item-->
-          <a href="{{route('admin.index')}}" class="dropdown-item">
+          <a href="{{route('admin.profile')}}" class="dropdown-item">
             <i class="ri-account-circle-fill align-middle me-1"></i>
             <span>My Account</span>
           </a>
 
           <!-- item-->
-          <a href="{{route('admin.index')}}" class="dropdown-item">
+          <a href="{{route('admin.setting')}}" class="dropdown-item">
             <i class="ri-settings-4-fill align-middle me-1"></i>
             <span>Settings</span>
           </a>
