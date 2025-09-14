@@ -13,4 +13,9 @@ class Customer extends Model
     protected $table = 'customer';
     protected $dates = ['deleted_at'];
     protected $guarded = [];
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'customer_id', 'id');
+    }
 }

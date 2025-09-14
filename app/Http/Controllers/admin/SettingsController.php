@@ -47,7 +47,8 @@ class SettingsController extends Controller
             'gst' => $request->gst,
             'pan' => $request->pan,
             'invoice_prefix' => $request->invoice_prefix,
-            'invoice_remarks' => $request->invoice_remarks
+            'invoice_remarks' => $request->invoice_remarks,
+            'customer_prefix' => $request->customer_prefix,
         ];
         if ($request->hasFile('logo')) {
             $logo = $request->file('logo');

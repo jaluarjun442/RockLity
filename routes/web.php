@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\CustomerController;
+use App\Http\Controllers\admin\InvoiceController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\SettingsController;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -64,6 +65,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit');
         Route::put('/update/{id}', [CustomerController::class, 'update'])->name('customer.update');
         Route::get('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
+    });
+
+    Route::group(['prefix' => 'invoice'], function () {
+        //invoice routes
+        Route::get('/', [InvoiceController::class, 'index'])->name('invoice');
+        Route::get('/getInvoiceData', [InvoiceController::class, 'getData'])->name('getInvoiceData');
+        Route::get('/ajax/customers', [InvoiceController::class, 'ajaxCustomers'])->name('invoice.get_customers_ajax_data');
+        Route::get('/ajax/products', [InvoiceController::class, 'ajaxProducts'])->name('invoice.get_products_ajax_data');
+        Route::get('/create', [InvoiceController::class, 'create'])->name('invoice.create');
+        Route::post('/store', [InvoiceController::class, 'store'])->name('invoice.store');
+        Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+        Route::put('/update/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
+        Route::get('/delete/{id}', [InvoiceController::class, 'delete'])->name('invoice.delete');
     });
 
     //Profile routes

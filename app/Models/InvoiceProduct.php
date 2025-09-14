@@ -13,4 +13,13 @@ class InvoiceProduct extends Model
     protected $table = 'invoice_product';
     protected $dates = ['deleted_at'];
     protected $guarded = [];
+
+    public function customer()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id', 'id');
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 }

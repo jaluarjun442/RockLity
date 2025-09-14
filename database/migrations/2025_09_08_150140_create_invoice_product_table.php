@@ -21,6 +21,8 @@ class CreateInvoiceProductTable extends Migration
             $table->decimal('quantity', 10, 2)->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('total', 10, 2)->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

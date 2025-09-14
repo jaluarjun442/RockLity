@@ -188,11 +188,16 @@
                         <hr>
                         <h5 class=" mb-1 fs-16">Invoice Setting</h5>
                         <div class="mb-3 col-md-4">
+                            <label for="customer_prefix" class="form-label">Customer Prefix</label>
+                            <input value="{{ old('customer_prefix',$setting->customer_prefix) }}" type="text" class="form-control" id="customer_prefix" name="customer_prefix" placeholder="Customer Prefix">
+                            <span class="error text-danger"> {{ $errors->first('customer_prefix') }}</span>
+                        </div>
+                        <div class="mb-3 col-md-4">
                             <label for="invoice_prefix" class="form-label">Invoice Prefix</label>
                             <input value="{{ old('invoice_prefix',$setting->invoice_prefix) }}" type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" placeholder="Invoice Prefix">
                             <span class="error text-danger"> {{ $errors->first('invoice_prefix') }}</span>
                         </div>
-                        <div class="mb-3 col-md-8">
+                        <div class="mb-3 col-md-4">
                             <label for="invoice_remarks" class="form-label">Invoice Remarks</label>
                             <textarea class="form-control" id="invoice_remarks" name="invoice_remarks">{{$setting->invoice_remarks}}</textarea>
                             <span class="error text-danger"> {{ $errors->first('invoice_remarks') }}</span>

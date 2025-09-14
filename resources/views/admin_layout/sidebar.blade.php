@@ -79,6 +79,12 @@
               <span> Customer </span>
             </a>
           </li>
+          <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['invoice', 'invoice.create', 'invoice.edit']) ? 'menuitem-active' : '' }}">
+            <a href="{{route('invoice')}}" class="side-nav-link">
+              <i class="ri-file-text-line"></i>
+              <span> Invoice </span>
+            </a>
+          </li>
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.profile']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.profile')}}" class="side-nav-link">
               <i class="ri-user-line"></i>

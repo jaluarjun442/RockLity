@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Helper\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Invoice;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
-class CustomerController extends Controller
+class InvoiceController extends Controller
 {
-    public $route = 'admin/customer';
-    public $view  = 'admin/customer.';
-    public $moduleName = 'customer';
+    public $route = 'admin/invoice';
+    public $view  = 'admin/invoice.';
+    public $moduleName = 'invoice';
 
     public function index()
     {
@@ -24,61 +24,74 @@ class CustomerController extends Controller
 
     public function getData()
     {
-        $query = Customer::query();
+        $query = Invoice::with('customer');
         return Datatables::of($query)
             ->addIndexColumn()
-
+            ->addColumn('customer_name', function ($row) {
+                return $row->customer ? $row->customer->name : '-';
+            })
+            ->addColumn('customer_mobile', function ($row) {
+                return $row->customer ? $row->customer->mobile : '-';
+            })
             ->addColumn('action', function ($row) {
-                $editUrl = route('customer.edit', $row->id);
-                $deleteUrl = route('customer.delete', $row->id);
+                $editUrl = route('invoice.edit', $row->id);
+                $deleteUrl = route('invoice.delete', $row->id);
                 $btn = '';
                 $btn .= '<a href="' . $editUrl . '" class="edit btn btn-primary btn-sm" style="margin-left:5px;"><i class="ri-edit-line"></i> Edit</a>';
                 $btn .= '<button type="button" data-delete_url="' . $deleteUrl . '" class="edit btn btn-danger btn-sm" id="delete_model_btn" name="delete_model_btn" style="margin-left:5px;"> <i class="ri-delete-bin-line"></i> Delete</button>';
                 return $btn;
             })
-            ->editColumn('status', function ($row) {
-                return $row->status == 1 ? 'Active' : 'InActive';
+            ->editColumn('is_paid', function ($row) {
+                return $row->is_paid == 1 ? 'Yes' : 'No';
             })
-            ->rawColumns(['action', 'image'])
+            ->rawColumns(['action'])
             ->order(function ($query) {
                 $query->orderBy('id', 'desc');
             })
             ->make(true);
     }
+    public function ajaxCustomers(Request $request)
+    {
+        $search = $request->search;
+        $query = Customer::query()
+            ->where('is_active', 1)
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->limit(10)
+            ->get(['id', 'name', 'mobile']);
+        return response()->json($query);
+    }
+
+    public function ajaxProducts(Request $request)
+    {
+        $search = $request->search;
+        $query = Product::query()
+            ->where('status', 1)
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->limit(10)
+            ->get(['id', 'name', 'price']);
+        return response()->json($query);
+    }
 
     public function create()
     {
         $moduleName = $this->moduleName;
-        return view($this->view . 'form', compact('moduleName'));
+        $customers = \App\Models\Customer::where('is_active', 1)->orderBy('name')->get();
+        $products = \App\Models\Product::where('status', 1)->orderBy('name')->get();
+
+        return view($this->view . 'form', compact('moduleName', 'customers', 'products'));
     }
+
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'    => 'required|string|max:255',
-            'mobile'  => 'nullable|string|max:15',
-            'email'   => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'gst'     => 'nullable|string|max:20',
-            'pan'     => 'nullable|string|max:20',
-            'is_active' => 'required|in:1,0',
-        ]);
-        $lastId = Customer::latest('id')->value('id') ?? 0;
-        $customerNumber = Helper::settings()->customer_prefix . ($lastId + 1);
-
-        $data = [
-            'customer_number'      => $customerNumber,
-            'name'      => $request->name,
-            'mobile'    => $request->mobile,
-            'email'     => $request->email,
-            'address'   => $request->address,
-            'gst'       => $request->gst,
-            'pan'       => $request->pan,
-            'is_active' => $request->is_active,
-            'created_by' => Auth::id(),
-        ];
-
-        Customer::create($data);
+        dd($request->all());
 
         return redirect($this->route)->with('success', $this->moduleName . ' added successfully!');
     }
