@@ -8,7 +8,7 @@
   <meta content="#" name="description" />
   <meta content="#" name="author" />
   <!-- App favicon -->
-  <link rel="shortcut icon" href="{{ asset('public/setting') }}/{{ Helper::settings()->favicon }}">
+  <link rel="shortcut icon" href="{{asset('public/uploads/setting/' . Helper::settings()->favicon)}}">
   <!-- <link rel="shortcut icon" href="{{ asset('public/assets/images/favicon.ico') }}"> -->
   <!-- Daterangepicker css -->
   @include('admin_layout.headerscript')

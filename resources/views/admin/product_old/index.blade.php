@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin_master')
 
 
 @section('content')
@@ -16,7 +16,7 @@
     <div class="box-header with-border">
       <h3 class="box-title"></h3>
       <div class="box-tools">
-        <a href="{{ route('category.create') }}" class="btn btn-theme btn-sm">+ New {{ ucfirst($moduleName) }}</a>
+        <a href="{{ route('product.create') }}" class="btn btn-theme btn-sm">+ New {{ ucfirst($moduleName) }}</a>
       </div>
     </div>
     <div class="box-body">
@@ -52,7 +52,7 @@
   var table = $('.datatable').DataTable({
     processing: true,
     serverSide: true,
-    ajax: "{{ route('getCategoryData') }}",
+    ajax: "{{ route('getProductData') }}",
     columns: [{
         data: 'DT_RowIndex',
         name: 'DT_RowIndex'

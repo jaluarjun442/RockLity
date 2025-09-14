@@ -4,20 +4,20 @@
       <!-- Brand Logo Light -->
       <a href="{{route('admin.index')}}" class="logo logo-light">
         <span class="logo-lg">
-          <img src="{{ asset('public/assets/images/logo.png') }}" alt="logo">
+          <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="logo">
         </span>
         <span class="logo-sm">
-          <img src="{{ asset('public/assets/images/logo-sm.png') }}" alt="small logo">
+          <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="small logo">
         </span>
       </a>
 
       <!-- Brand Logo Dark -->
       <a href="{{route('admin.index')}}" class="logo logo-dark">
         <span class="logo-lg">
-          <img src="{{ asset('public/assets/images/logo-dark.png') }}" alt="dark logo">
+          <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="dark logo">
         </span>
         <span class="logo-sm">
-          <img src="{{ asset('public/assets/images/logo-sm.png') }}" alt="small logo">
+          <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="small logo">
         </span>
       </a>
 
@@ -41,7 +41,7 @@
             </div>
             <div class="flex-grow-1 ms-2">
               <span class="fw-semibold fs-15 d-block">{{ Auth::user()->name }}</span>
-              <span class="fs-13">Admin</span>
+              <span class="fs-13">{{Helper::settings()->name}}</span>
             </div>
             <div class="ms-auto">
               <i class="ri-arrow-right-s-fill fs-20"></i>
@@ -62,7 +62,7 @@
           </li>
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['category', 'category.create', 'category.edit']) ? 'menuitem-active' : '' }}">
             <a href="{{route('category')}}" class="side-nav-link">
-              <i class="ri-price-tag-line"></i>
+              <i class="ri-price-tag-3-line"></i>
               <span> Category </span>
             </a>
           </li>
@@ -76,8 +76,15 @@
 
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.profile']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.profile')}}" class="side-nav-link">
-              <i class="ri-calendar-2-fill"></i>
+              <i class="ri-user-line"></i>
               <span> Profile </span>
+            </a>
+          </li>
+
+          <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.setting']) ? 'menuitem-active' : '' }}">
+            <a href="{{route('admin.setting')}}" class="side-nav-link">
+              <i class="ri-settings-2-line"></i>
+              <span> Setting </span>
             </a>
           </li>
 

@@ -43,8 +43,8 @@
               <span class="error text-danger"> {{ $errors->first('status') }}</span>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Add</button>
-          <a href="{{ route('category') }}" class="btn btn-info">Cancel</a>
+          <button type="submit" class="btn btn-primary"><i class="ri-edit-line"></i>Add</button>
+          <a href="{{ route('category') }}" class="btn btn-info"><i class="ri-close-line"></i>Cancel</a>
         </form>
       </div>
     </div>

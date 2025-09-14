@@ -2,76 +2,122 @@
 
 
 @section('content')
-<section class="content-header">
-  <h1>
-    {{ ucfirst($moduleName) }}
-  </h1>
-  <ol class="breadcrumb">
-    <li><a href="{{ url('admin') }}"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li><a href="#" active>{{ ucfirst($moduleName) }}</a></li>
-  </ol>
-</section>
-<section class="content">
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title"></h3>
-      <div class="box-tools">
-        <a href="{{ route('product.create') }}" class="btn btn-theme btn-sm">+ New {{ ucfirst($moduleName) }}</a>
+<div class="row mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body card-body-breadcums">
+        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+          <h4 class="page-title">{{ ucfirst($moduleName) }}</h4>
+          <a href="{{ route('product.create') }}" class="btn btn-success mb-2">
+            <i class="ri-add-line"></i> Add {{ ucfirst($moduleName) }}
+          </a>
+        </div>
       </div>
     </div>
-    <div class="box-body">
-      <table class="table table-bordered datatable">
-        <thead>
-          <tr>
-            <th>Sr No.</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-        <tfoot>
-          <tr>
-            <th>Sr No.</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-    <div class="box-footer">
+  </div>
+</div>
+<div class="row mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <table id="datatable" class="table table-striped dt-responsive nowrap w-100">
+          <thead>
+            <tr>
+              <!-- <th>Id</th> -->
+              <!-- <th>Image</th> -->
+              <th>Sku</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+          <!-- <tfoot>
+            <tr>
+              <th>Sr No.</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </tfoot> -->
+        </table>
+      </div>
     </div>
   </div>
-</section>
+</div>
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title" id="imageModalLabel">Product Image</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-2">
+        <img id="modalImage" src="" class="img-fluid rounded shadow-sm" alt="Product Image" style="max-height:250px;">
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('script')
 <script>
-  var table = $('.datatable').DataTable({
+  var table = $('#datatable').DataTable({
+    keys: !0,
+    scrollX: true,
+    "pagingType": "simple_numbers",
+    language: {
+      paginate: {
+        previous: "<i class='ri-arrow-left-s-line'>",
+        next: "<i class='ri-arrow-right-s-line'>"
+      }
+    },
+    drawCallback: function() {
+      $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+    },
     processing: true,
     serverSide: true,
     ajax: "{{ route('getProductData') }}",
-    columns: [{
-        data: 'DT_RowIndex',
-        name: 'DT_RowIndex'
+    columns: [
+      // {
+      //   data: 'id',
+      //   name: 'id'
+      // },
+      // {
+      //   data: 'image',
+      //   name: 'image'
+      // },
+      {
+        data: 'sku',
+        name: 'sku'
       },
       {
         data: 'name',
         name: 'name'
       },
       {
-        data: 'is_active',
-        name: 'is_active'
+        data: 'price',
+        name: 'price'
+      },
+      {
+        data: 'status',
+        name: 'status'
       },
       {
         data: 'action',
         name: 'action',
         orderable: false,
-        searchable: false
+        searchable: false,
       },
     ]
+  });
+  $(document).on('click', '.view-image-btn', function() {
+    let imageUrl = $(this).data('image_url');
+    $('#modalImage').attr('src', imageUrl);
+    $('#imageModal').modal('show');
   });
 </script>
 @endsection

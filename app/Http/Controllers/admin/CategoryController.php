@@ -35,9 +35,18 @@ class CategoryController extends Controller
             ->addColumn('action', function ($row) {
                 $editUrl = route('category.edit', $row->id);
                 $deleteUrl = route('category.delete', $row->id);
+                $viewImageUrl = $row->image ? asset('public/uploads/category/' . $row->image) : '';
                 $btn = '';
                 $btn .= '<a href="' . $editUrl . '" class="edit btn btn-primary btn-sm" style="margin-left:5px;"><i class="ri-edit-line"></i> Edit</a>';
                 $btn .= '<button type="button" data-delete_url="' . $deleteUrl . '" class="edit btn btn-danger btn-sm" id="delete_model_btn" name="delete_model_btn" style="margin-left:5px;"> <i class="ri-delete-bin-line"></i> Delete</button>';
+                if ($viewImageUrl) {
+                    $btn .= '<button type="button" 
+                            class="btn btn-info btn-sm view-image-btn" 
+                            data-image_url="' . $viewImageUrl . '" 
+                            style="margin-left:5px;">
+                            <i class="ri-image-line"></i> Image
+                        </button>';
+                }
                 return $btn;
             })
             ->editColumn('status', function ($row) {
@@ -61,7 +70,7 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required',
             'status' => 'required|in:1,0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp,avif,bmp,tif,tiff,ico|max:4096',
         ]);
 
         $data = [
@@ -79,7 +88,6 @@ class CategoryController extends Controller
             $data['image'] = $imageName;
         }
         Category::create($data);
-        Helper::successMsg('insert', $this->moduleName);
         return redirect($this->route)->with('success', $this->moduleName . ' added successfully!');
     }
 
@@ -99,7 +107,7 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required',
             'status' => 'required|in:1,0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp,avif,bmp,tif,tiff,ico|max:4096',
         ]);
 
         $data = [
@@ -120,14 +128,12 @@ class CategoryController extends Controller
             $data['image'] = $imageName;
         }
         $category->update($data);
-        Helper::successMsg('update', $this->moduleName);
         return redirect($this->route)->with('success', $this->moduleName . ' edited successfully!');
     }
 
     public function delete($id)
     {
         Category::find($id)->delete();
-        Helper::successMsg('delete', $this->moduleName);
         return redirect($this->route)->with('success', $this->moduleName . ' deleted successfully!');;
     }
 }

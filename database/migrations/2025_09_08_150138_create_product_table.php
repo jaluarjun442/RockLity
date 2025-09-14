@@ -21,9 +21,11 @@ class CreateProductTable extends Migration
             $table->string('image')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('discount', 10, 2)->nullable();
-            $table->string('unit_type')->default('Piece')->comment('KG,Meter,Piece,Litre,Gram');
+            $table->string('unit_type')->default('Piece')->comment('KG,Meter,Piece,Liter,Gram');
             $table->integer('category_id')->nullable();
-            $table->boolean('is_active')->comment('1-active,0-inactive')->default(1);
+            $table->boolean('status')->comment('1-active,0-inactive')->default(1);
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

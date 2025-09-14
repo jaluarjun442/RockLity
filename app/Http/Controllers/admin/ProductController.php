@@ -4,9 +4,11 @@ namespace App\Http\Controllers\admin;
 
 use App\Helper\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -22,84 +24,149 @@ class ProductController extends Controller
 
     public function getData()
     {
-        $data = Product::get();
-        return Datatables::of($data)
+        $query = Product::query();
+        return Datatables::of($query)
             ->addIndexColumn()
+            ->addColumn('image', function ($row) {
+                if ($row->image) {
+                    $url = asset('public/uploads/product/' . $row->image);
+                    return '<img src="' . $url . '" alt="Image" width="100" height="100">';
+                }
+                return '';
+            })
             ->addColumn('action', function ($row) {
-                $editUrl = route('product.edit', encrypt($row->id));
-                $deleteUrl = route('product.delete', encrypt($row->id));
-                $statusUrl = route('product.changeStatus', encrypt($row->id));
+                $editUrl = route('product.edit', $row->id);
+                $deleteUrl = route('product.delete', $row->id);
+                $viewImageUrl = $row->image ? asset('public/uploads/product/' . $row->image) : '';
                 $btn = '';
                 $btn .= '<a href="' . $editUrl . '" class="edit btn btn-primary btn-sm" style="margin-left:5px;"><i class="fa fa-pencil"> </i> Edit</a>';
-                // if ($row->is_active == 1) {
-                //     $btn .= '<a href="' . $statusUrl . '" class="edit btn btn-success btn-sm" style="margin-left:5px;"><i class="fa fa-check"> </i> Inactive</a>';
-                // } else {
-                //     $btn .= '<a href="' . $statusUrl . '" class="edit btn btn-danger btn-sm" style="margin-left:5px;"><i class="fa fa-check" > </i> Active</a>';
-                // }
-                $btn .= '<a href="' . $deleteUrl . '" class="edit btn btn-danger btn-sm" style="margin-left:5px;"> <i class="fa fa-trash" /> </i> Delete</a>';
+                $btn .= '<button type="button" data-delete_url="' . $deleteUrl . '" class="edit btn btn-danger btn-sm" id="delete_model_btn" name="delete_model_btn" style="margin-left:5px;"> <i class="ri-delete-bin-line"></i> Delete</button>';
+                if ($viewImageUrl) {
+                    $btn .= '<button type="button" 
+                            class="btn btn-info btn-sm view-image-btn" 
+                            data-image_url="' . $viewImageUrl . '" 
+                            style="margin-left:5px;">
+                            <i class="ri-image-line"></i> Image
+                        </button>';
+                }
                 return $btn;
             })
-
-            ->editColumn('is_active', function ($row) {
-                return $row->is_active == 1 ? 'Active' : 'InActive';
+            ->editColumn('status', function ($row) {
+                return $row->status == 1 ? 'Active' : 'InActive';
             })
-
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'image'])
+            ->order(function ($query) {
+                $query->orderBy('id', 'desc');
+            })
             ->make(true);
     }
 
     public function create()
     {
         $moduleName = $this->moduleName;
-        return view($this->view . 'form', compact('moduleName'));
+        $categories = Category::where('status', 1)->get();
+        return view($this->view . 'form', compact('moduleName', 'categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'status' => 'required|in:1,0'
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sku'         => 'nullable|string|max:255',
+            'price'       => 'nullable|numeric|min:0',
+            'discount'    => 'nullable|numeric|min:0',
+            'unit_type'   => 'required|in:Piece,KG,Meter,Litre,Gram',
+            'category_id' => 'nullable|exists:category,id',
+            'status'      => 'required|in:1,0',
+            'image'       => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp,avif,bmp,tif,tiff,ico|max:4096',
         ]);
-        Product::create([
-            'name' => $request->name,
-            'is_active' => $request->status
+
+        $data = $request->only([
+            'name',
+            'description',
+            'sku',
+            'price',
+            'discount',
+            'unit_type',
+            'category_id',
+            'status'
         ]);
-        Helper::successMsg('insert', $this->moduleName);
-        return redirect($this->route);
+
+        $data['created_by'] = Auth::id();
+
+        // Handle image
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = date('YmdHis') . '_' . rand(100000, 999999) . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/product');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $image->move($destinationPath, $imageName);
+            $data['image'] = $imageName;
+        }
+
+        Product::create($data);
+        return redirect($this->route)->with('success', $this->moduleName . ' added successfully!');
     }
 
     public function edit($id)
     {
         $moduleName = $this->moduleName;
-        $product = Product::find(decrypt($id));
-        return view($this->view . '_form', compact('product', 'moduleName'));
+        $categories = Category::where('status', 1)->get();
+        $product = Product::find($id);
+        return view($this->view . '_form', compact('product', 'moduleName', 'categories'));
     }
 
     public function update(Request $request, $id)
     {
-        Product::find($id)->update(['name' => $request->name, 'is_active' => $request->status]);
-        Helper::successMsg('update', $this->moduleName);
-        return redirect($this->route);
-    }
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'status'      => 'required|in:1,0',
+            'image'       => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp,avif,bmp,tif,tiff,ico|max:4096',
+            'price'       => 'nullable|numeric',
+            'discount'    => 'nullable|numeric',
+            'unit_type'   => 'required|string|max:50',
+            'category_id' => 'nullable|integer',
+        ]);
 
-    public function changeStatus($id)
-    {
-        $status = Product::find(decrypt($id))->is_active;
+        $product = Product::findOrFail($id);
 
-        if ($status == 1) {
-            Product::find(decrypt($id))->update(['is_active' => 0]);
-        } else {
-            Product::find(decrypt($id))->update(['is_active' => 1]);
+        $data = [
+            'name'        => $request->name,
+            'description' => $request->description,
+            'sku'         => $request->sku,
+            'price'       => $request->price,
+            'discount'    => $request->discount,
+            'unit_type'   => $request->unit_type,
+            'category_id' => $request->category_id,
+            'status'      => $request->status,
+            'updated_by'  => Auth::id(),
+        ];
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = date('YmdHis') . '_' . rand(100000, 999999) . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/product');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            if ($product->image && file_exists($destinationPath . '/' . $product->image)) {
+                unlink($destinationPath . '/' . $product->image);
+            }
+            $image->move($destinationPath, $imageName);
+            $data['image'] = $imageName;
         }
 
-        Helper::successMsg('custom', 'Status Change Successfully.');
-        return redirect($this->route);
+        $product->update($data);
+
+        return redirect($this->route)->with('success', $this->moduleName . ' updated successfully!');
     }
 
     public function delete($id)
     {
-        Product::find(decrypt($id))->delete();
-        Helper::successMsg('delete', $this->moduleName);
-        return redirect($this->route);
+        Product::find($id)->delete();
+        return redirect($this->route)->with('success', $this->moduleName . ' deleted successfully!');;
     }
 }

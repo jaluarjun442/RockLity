@@ -30,6 +30,21 @@
                 <div class="my-auto">
                     <h4 class="mt-0">Sign In</h4>
                     <p class="text-muted mb-4">Enter your email address and password to access account.</p>
+                    @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                     <form action="{{ route('login') }}" method="POST">
                         @csrf()
                         <div class="mb-3">

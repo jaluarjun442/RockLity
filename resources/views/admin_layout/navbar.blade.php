@@ -6,19 +6,19 @@
       <div class="logo-topbar">
         <a href="{{ url('admin') }}" class="logo-light">
           <span class="logo-lg">
-            <img src="{{ asset('public/assets/images/logo.png') }}" alt="logo">
+            <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="logo">
           </span>
           <span class="logo-sm">
-            <img src="{{ asset('public/assets/images/logo-sm.png') }}" alt="small logo">
+            <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="small logo">
           </span>
         </a>
 
         <a href="{{ url('admin') }}" class="logo-dark">
           <span class="logo-lg">
-            <img src="{{ asset('public/assets/images/logo-dark.png') }}" alt="dark logo">
+            <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="dark logo">
           </span>
           <span class="logo-sm">
-            <img src="{{ asset('public/assets/images/logo-sm.png') }}" alt="small logo">
+            <img src="{{asset('public/uploads/setting/' . Helper::settings()->logo)}}" alt="small logo">
           </span>
         </a>
       </div>
@@ -95,13 +95,13 @@
                   <span>Behance</span>
                 </a>
               </div>
-            </div> <!-- end row-->
+            </div> 
           </div>
 
         </div>
       </li>
 
-      <li class="d-none d-sm-inline-block">
+      <!-- <li class="d-none d-sm-inline-block">
         <a class="nav-link" data-bs-toggle="offcanvas" href="#theme-settings-offcanvas">
           <i class="ri-settings-3-fill fs-22"></i>
         </a>
@@ -118,7 +118,7 @@
         <a class="nav-link" href="#" data-toggle="fullscreen">
           <i class="ri-fullscreen-line fs-22"></i>
         </a>
-      </li>
+      </li> -->
 
       <li class="dropdown me-md-2">
         <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">

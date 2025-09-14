@@ -1,6 +1,6 @@
 @extends('admin_master')
 @section('content')
-<div class="row row-cols-1 row-cols-xxl-6 row-cols-lg-4 row-cols-md-2 mt-2">
+<div class="row row-cols-1 row-cols-xxl-4 row-cols-lg-4 row-cols-md-2 mt-2">
     <div class="col">
         <div class="card widget-icon-box">
             <div class="card-body">

@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin_master')
 
 @section('content')
 <section class="content-header">

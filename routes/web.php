@@ -4,10 +4,11 @@ use App\Http\Controllers\admin\QuestionController;
 use App\Http\Controllers\admin\SitemapController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\admin\KeywordController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\SettingsController;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 /*
@@ -59,7 +60,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
     });
     //Profile routes
     Route::get('profile', [ProfileController::class, 'index'])->name('admin.profile');
-    Route::put('profile-update', [ProfileController::class, 'update'])->name('admin.profile.update');
+    Route::put('profile-update/{id}', [ProfileController::class, 'update'])->name('admin.profile.update');
+
+    //Setting routes
+    Route::get('setting', [SettingsController::class, 'index'])->name('admin.setting');
+    Route::put('setting-update/{id}', [SettingsController::class, 'update'])->name('admin.setting.update');
 });
 
 Route::get('/test-pdf', function () {

@@ -1,15 +1,10 @@
-     <footer class="footer">
+     <footer class="footer text-center bg-white">
        <div class="container-fluid">
          <div class="row">
-           <div class="col-md-6">
+           <div class="col-md-12">
              <script>
                document.write(new Date().getFullYear())
              </script> © {{ Helper::settings()->name }}
-           </div>
-           <div class="col-md-6">
-             <div class="text-md-end footer-links d-none d-md-block">
-
-             </div>
            </div>
          </div>
        </div>
