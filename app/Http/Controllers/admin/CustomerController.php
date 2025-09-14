@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -67,7 +68,6 @@ class CustomerController extends Controller
             'pan'     => 'nullable|string|max:20',
             'is_active' => 'required|in:1,0',
         ]);
-
         $data = [
             'name'      => $request->name,
             'mobile'    => $request->mobile,
@@ -76,6 +76,7 @@ class CustomerController extends Controller
             'gst'       => $request->gst,
             'pan'       => $request->pan,
             'is_active' => $request->is_active,
+            'created_by' => Auth::id(),
         ];
 
         Customer::create($data);
@@ -115,6 +116,7 @@ class CustomerController extends Controller
             'gst'     => $request->gst,
             'pan'     => $request->pan,
             'is_active' => $request->is_active,
+            'updated_by' => Auth::id(),
         ];
 
         $customer->update($data);

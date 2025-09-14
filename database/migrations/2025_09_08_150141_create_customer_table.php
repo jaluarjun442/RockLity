@@ -22,6 +22,8 @@ class CreateCustomerTable extends Migration
             $table->string('gst')->nullable();
             $table->string('pan')->nullable();
             $table->boolean('is_active')->comment('1-active,0-inactive')->default(1);
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
