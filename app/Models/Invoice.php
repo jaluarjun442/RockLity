@@ -25,6 +25,7 @@ class Invoice extends Model
         'payment_type',
         'description',
         'invoice_datetime',
+        'due_date',
         'created_by',
         'updated_by',
         'deleted_at',
@@ -39,5 +40,9 @@ class Invoice extends Model
     public function invoice_product()
     {
         return $this->hasMany(InvoiceProduct::class, 'invoice_id', 'id');
+    }
+    public function payment()
+    {
+        return $this->hasMany(Payment::class, 'invoice_id', 'id');
     }
 }

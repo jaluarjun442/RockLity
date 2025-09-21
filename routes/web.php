@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\CustomerController;
 use App\Http\Controllers\admin\InvoiceController;
+use App\Http\Controllers\admin\PaymentController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\SettingsController;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -78,6 +79,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
         Route::put('/update/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
         Route::get('/delete/{id}', [InvoiceController::class, 'delete'])->name('invoice.delete');
+        Route::get('/ajax/payment_data', [InvoiceController::class, 'ajaxPaymentsData'])->name('invoice.get_payment_ajax_data');
+        Route::post('/add_payment', [InvoiceController::class, 'addPayment'])->name('invoice.add_payment');
+    });
+
+    Route::group(['prefix' => 'payment'], function () {
+        //payment routes
+        Route::get('/', [PaymentController::class, 'index'])->name('payment');
+        Route::get('/getInvoicePaymentData', [PaymentController::class, 'getData'])->name('getInvoicePaymentData');
+        Route::get('/{id}/edit', [PaymentController::class, 'edit'])->name('payment.edit');
+        Route::post('/{id}/update', [PaymentController::class, 'update'])->name('payment.update');
+
+        Route::get('/delete/{id}', [PaymentController::class, 'delete'])->name('payment.delete');
     });
 
     //Profile routes

@@ -8,9 +8,6 @@
       <div class="card-body card-body-breadcums">
         <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
           <h4 class="page-title">{{ ucfirst($moduleName) }}</h4>
-          <a href="{{ route('invoice.create') }}" class="btn btn-success mb-2">
-            <i class="ri-add-line"></i> Add {{ ucfirst($moduleName) }}
-          </a>
         </div>
       </div>
     </div>
@@ -31,15 +28,17 @@
             <input type="text" id="mobile" class="form-control" placeholder="Enter mobile">
           </div>
           <div class="mb-1 col-md-3">
-            <label for="invoice_datetime" class="form-label">Invoice Date</label>
-            <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" placeholder="Select date range" value="">
+            <label for="payment_datetime" class="form-label">Payment Date</label>
+            <input type="text" class="form-control" id="payment_datetime" name="payment_datetime" placeholder="Select date range" value="">
           </div>
           <div class="col-md-1">
-            <label for="is_paid" class="form-label">Paid?</label>
+            <label for="is_paid" class="form-label">Method</label>
             <select class="form-select" id="is_paid">
               <option value="">All</option>
-              <option value="1">Yes</option>
-              <option value="0">No</option>
+              <option value="Cash">Cash</option>
+              <option value="Online">Online</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div style="margin-top: 2.35rem;" class="mb-1 col-md-2">
@@ -64,9 +63,9 @@
               <th>Invoice Number</th>
               <th>Customer</th>
               <th>Mobile</th>
-              <th>Total</th>
-              <th>Paid?</th>
-              <th>Date</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Time</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -77,18 +76,42 @@
     </div>
   </div>
 </div>
-<!-- Payment Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+<div class="modal fade" id="editPaymentModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="paymentModalLabel">Invoice Payment</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">Edit Payment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <div id="paymentFormContainer">
-          <div class="text-center">Loading...</div>
-        </div>
+        <form id="updatePaymentForm">
+          @csrf
+          <input type="hidden" name="payment_id" id="payment_id">
+
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label>Amount</label>
+              <input type="number" name="amount" id="amount" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+              <label>Payment Method</label>
+              <select name="payment_type" id="payment_type" class="form-control" required>
+                <option value="Cash">Cash</option>
+                <option value="Online">Online</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label>Remarks</label>
+              <input type="text" name="remarks" id="remarks" class="form-control" placeholder="Enter remarks (optional)">
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button type="submit" class="btn btn-success">Update Payment</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -98,64 +121,59 @@
 
 @section('script')
 <script>
-  $(document).on('click', '.view-payment', function() {
-    let invoiceId = $(this).data('id');
+  $(document).on('click', '.edit-payment-btn', function() {
+    var paymentId = $(this).data('id');
 
-    $('#paymentFormContainer').html('<div class="text-center">Loading...</div>');
-    $('#paymentModal').modal('show');
+    // Use named route
+    var url = '{{ route("payment.edit", ":id") }}';
+    url = url.replace(':id', paymentId);
 
     $.ajax({
-      url: '{{ route("invoice.get_payment_ajax_data") }}',
+      url: url,
       type: 'GET',
-      data: {
-        invoice_id: invoiceId
-      },
       success: function(res) {
-        $('#paymentFormContainer').html(res);
-      },
-      error: function() {
-        $('#paymentFormContainer').html('<div class="text-danger text-center">Failed to load form.</div>');
+        // Fill form fields
+        $('#payment_id').val(res.id);
+        $('#amount').val(res.amount);
+        $('#payment_type').val(res.payment_type);
+        $('#remarks').val(res.remarks);
+
+        // Show modal
+        $('#editPaymentModal').modal('show');
       }
     });
   });
 
-  // Submit payment via AJAX
-  $(document).on('submit', '#updatePaymentForm', function(e) {
+  $('#updatePaymentForm').on('submit', function(e) {
     e.preventDefault();
-    let form = $(this);
-    let invoiceId = form.find('input[name="invoice_id"]').val();
+
+    var paymentId = $('#payment_id').val();
+    var url = '{{ route("payment.update", ":id") }}';
+    url = url.replace(':id', paymentId);
 
     $.ajax({
-      url: '{{ route("invoice.add_payment") }}',
+      url: url,
       type: 'POST',
-      data: form.serialize(),
+      data: $(this).serialize(),
       success: function(res) {
-        $.toast({
-          heading: 'Success',
-          text: "Payment added successfully",
-          showHideTransition: 'slide',
-          icon: 'success',
-          position: 'top-center',
-          loaderBg: '#159488',
-          hideAfter: 3000
-        });
-        $('#paymentModal').modal('hide');
-        $('#datatable').DataTable().ajax.reload(null, false);
-      },
-      error: function(err) {
-        $.toast({
-          heading: 'Error',
-          text: "Failed to Add Payment",
-          showHideTransition: 'slide',
-          icon: 'error',
-          position: 'top-center',
-          loaderBg: '#de4034',
-          hideAfter: 3000
-        });
+        if (res.success) {
+          $('#editPaymentModal').modal('hide');
+          $('#datatable').DataTable().ajax.reload(null, false); // reload table
+          $.toast({
+            heading: 'Success',
+            text: "Payment updated successfully",
+            showHideTransition: 'slide',
+            icon: 'success',
+            position: 'top-center',
+            loaderBg: '#159488',
+            hideAfter: 3000
+          });
+        }
       }
     });
   });
-  $("#invoice_datetime").flatpickr({
+
+  $("#payment_datetime").flatpickr({
     mode: "range",
     dateFormat: "Y-m-d",
     // maxDate: "today",
@@ -208,9 +226,9 @@
     processing: true,
     serverSide: true,
     ajax: {
-      url: "{{ route('getInvoiceData') }}",
+      url: "{{ route('getInvoicePaymentData') }}",
       data: function(d) {
-        d.invoice_datetime = $('#invoice_datetime').val();
+        d.payment_datetime = $('#payment_datetime').val();
         d.mobile = $('#mobile').val();
         d.customer_id = $('#customer_id').val();
         d.is_paid = $('#is_paid').val();
@@ -230,16 +248,16 @@
         name: 'customer_mobile'
       },
       {
-        data: 'grand_total',
-        name: 'grand_total'
+        data: 'amount',
+        name: 'amount'
       },
       {
-        data: 'is_paid',
-        name: 'is_paid'
+        data: 'payment_type',
+        name: 'payment_type'
       },
       {
-        data: 'invoice_datetime',
-        name: 'invoice_datetime'
+        data: 'payment_datetime',
+        name: 'payment_datetime'
       },
       {
         data: 'action',
@@ -257,10 +275,11 @@
 
   // Clear filter button click
   $('#clearFilterBtn').on('click', function() {
-    $('#invoice_datetime').val('');
+    $('#payment_datetime').val('');
     $('#mobile').val('');
     $('#customer_id').val(null).trigger('change');
     $('#is_paid').val('');
+
     $('#payment_type').val('');
     table.draw();
   });

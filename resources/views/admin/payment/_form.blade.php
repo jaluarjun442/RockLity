@@ -107,10 +107,9 @@
                                     value="{{ number_format($invoice->grand_total,2) }}" readonly>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                        </div>
+
                         <!-- Payment -->
-                        <div class="col-md-2 payment_type_div">
+                        <div class="col-md-4">
                             <label for="payment_type" class="form-label">Payment Method</label>
                             <select name="payment_type" id="payment_type" class="form-select">
                                 <option value="Cash" {{ $invoice->payment_type=='Cash'?'selected':'' }}>Cash</option>
@@ -120,17 +119,12 @@
                                 <option value="Other" {{ $invoice->payment_type=='Other'?'selected':'' }}>Other</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-4">
                             <label for="is_paid" class="form-label">Paid</label>
                             <select name="is_paid" id="is_paid" class="form-select">
                                 <option value="1" {{ $invoice->is_paid ? 'selected':'' }}>Yes</option>
                                 <option value="0" {{ !$invoice->is_paid ? 'selected':'' }}>No</option>
                             </select>
-                        </div>
-                        <div class="mb-1 col-md-2 d-none payment_due_date_div">
-                            <label for="due_date" class="form-label">Due Date</label>
-                            <input type="text" class="form-control" id="due_date" name="due_date" value="{{ $invoice->due_date }}">
-                            <span class="error text-danger">{{ $errors->first('due_date') }}</span>
                         </div>
                     </div>
                     <hr>
@@ -146,7 +140,6 @@
 <script>
     $(document).ready(function() {
         $("#invoice_datetime").flatpickr();
-        $("#due_date").flatpickr();
         // Initialize Customer Select2 AJAX
         $('#customer_id').select2({
             placeholder: 'Search customer',
@@ -303,23 +296,6 @@
             $('#grand_total').val((subTotal - discount + tax_charge).toFixed(2));
         }
 
-        function togglePaymentFields() {
-            let isPaid = $("#is_paid").val();
-            if (isPaid == "1") {
-                $(".payment_type_div").removeClass("d-none");
-                $(".payment_due_date_div").addClass("d-none");
-                let today = new Date().toISOString().split("T")[0];
-                $("#due_date").val(today);
-            } else if (isPaid == "0") {
-                $(".payment_type_div").addClass("d-none");
-                $(".payment_due_date_div").removeClass("d-none");
-                $("#payment_type").val("Cash");
-            }
-        }
-        $("#is_paid").on("change", function() {
-            togglePaymentFields();
-        });
-        togglePaymentFields();
 
     });
 </script>

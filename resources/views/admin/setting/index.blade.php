@@ -227,7 +227,7 @@
     $(document).ready(function() {
 
         $('#default_customer_id').select2({
-            placeholder: 'Search customer by name or mobile',
+            placeholder: 'Search customer',
             allowClear: true,
             ajax: {
                 url: '{{ route("invoice.get_customers_ajax_data") }}',

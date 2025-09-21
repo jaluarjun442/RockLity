@@ -26,6 +26,7 @@ class CreateInvoiceTable extends Migration
             $table->string('payment_type')->default('Cash')->comment('Cash,Online,Cheque,Due,Other');
             $table->longText('description')->nullable();
             $table->dateTime('invoice_datetime')->nullable()->comment('Invoice Date & Time');
+            $table->date('due_date')->nullable()->comment('Invoice Due Date');
             $table->softDeletes();
             $table->timestamps();
         });

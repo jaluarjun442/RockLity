@@ -85,13 +85,18 @@
               <span> Invoice </span>
             </a>
           </li>
+          <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['payment', 'payment.create', 'payment.edit']) ? 'menuitem-active' : '' }}">
+            <a href="{{route('payment')}}" class="side-nav-link">
+              <i class="ri-money-dollar-circle-line"></i>
+              <span> Payment </span>
+            </a>
+          </li>
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.profile']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.profile')}}" class="side-nav-link">
               <i class="ri-user-line"></i>
               <span> Profile </span>
             </a>
           </li>
-
           <li class="side-nav-item {{ in_array(Route::currentRouteName(), ['admin.setting']) ? 'menuitem-active' : '' }}">
             <a href="{{route('admin.setting')}}" class="side-nav-link">
               <i class="ri-settings-2-line"></i>
