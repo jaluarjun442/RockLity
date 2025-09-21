@@ -9,4 +9,9 @@ class Setting extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function default_customer()
+    {
+        return $this->hasOne(Customer::class, 'id', 'default_customer_id');
+    }
 }

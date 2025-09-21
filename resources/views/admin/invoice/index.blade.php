@@ -24,7 +24,7 @@
           <thead>
             <tr>
               <th>Invoice Number</th>
-              <th>Name</th>
+              <th>Customer</th>
               <th>Mobile</th>
               <th>Total</th>
               <th>Paid?</th>
@@ -80,8 +80,8 @@
         name: 'is_paid'
       },
       {
-        data: 'created_at',
-        name: 'created_at'
+        data: 'invoice_datetime',
+        name: 'invoice_datetime'
       },
       {
         data: 'action',

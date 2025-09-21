@@ -15,7 +15,7 @@ class CreateInvoiceTable extends Migration
     {
         Schema::create('invoice', function (Blueprint $table) {
             $table->id();
-            $table->integer('invoice_number')->nullable();
+            $table->string('invoice_number')->nullable();
             $table->integer('customer_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable()->comment('Admin who created the invoice');
             $table->decimal('sub_total', 10, 2)->nullable();

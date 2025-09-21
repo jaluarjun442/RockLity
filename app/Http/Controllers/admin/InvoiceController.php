@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Helper\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\InvoiceProduct;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +36,11 @@ class InvoiceController extends Controller
             ->addColumn('customer_mobile', function ($row) {
                 return $row->customer ? $row->customer->mobile : '-';
             })
+            ->editColumn('invoice_datetime', function ($row) {
+                return $row->invoice_datetime
+                    ? Carbon::parse($row->invoice_datetime)->format('d-m-Y')
+                    : '-';
+            })
             ->addColumn('action', function ($row) {
                 $editUrl = route('invoice.edit', $row->id);
                 $deleteUrl = route('invoice.delete', $row->id);
@@ -44,6 +52,17 @@ class InvoiceController extends Controller
             ->editColumn('is_paid', function ($row) {
                 return $row->is_paid == 1 ? 'Yes' : 'No';
             })
+            ->filterColumn('customer_name', function ($query, $keyword) {
+                $query->whereHas('customer', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('customer_mobile', function ($query, $keyword) {
+                $query->whereHas('customer', function ($q) use ($keyword) {
+                    $q->where('mobile', 'like', "%{$keyword}%");
+                });
+            })
+
             ->rawColumns(['action'])
             ->order(function ($query) {
                 $query->orderBy('id', 'desc');
@@ -82,8 +101,8 @@ class InvoiceController extends Controller
     public function create()
     {
         $moduleName = $this->moduleName;
-        $customers = \App\Models\Customer::where('is_active', 1)->orderBy('name')->get();
-        $products = \App\Models\Product::where('status', 1)->orderBy('name')->get();
+        $customers = Customer::where('is_active', 1)->orderBy('name')->get();
+        $products = Product::where('status', 1)->orderBy('name')->get();
 
         return view($this->view . 'form', compact('moduleName', 'customers', 'products'));
     }
@@ -91,47 +110,106 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+        $validated = $request->validate([
+            'customer_id'     => 'required',
+            'invoice_datetime' => 'required|date',
+            'product_id'      => 'required|array|min:1',
+            'product_id.*'    => 'required',
+            'quantity.*'      => 'required|numeric|min:1',
+            'price.*'         => 'required|numeric|min:0',
+            'total.*'         => 'required|numeric|min:0',
+            'sub_total'       => 'required|numeric|min:0',
+            'total_discount'  => 'nullable|numeric|min:0',
+            'total_charge'    => 'nullable|numeric|min:0',
+            'grand_total'     => 'required|numeric|min:0',
+            'payment_type'    => 'required|string',
+            'is_paid'         => 'required|boolean',
+        ]);
 
-        return redirect($this->route)->with('success', $this->moduleName . ' added successfully!');
+        $lastId = Invoice::max('id');
+        $lastIdPadded = str_pad(($lastId + 1), 6, '0', STR_PAD_LEFT);
+        $invoiceNumber = Helper::settings()['invoice_prefix'] . $lastIdPadded;
+        $invoice = Invoice::create([
+            'invoice_number'  => $invoiceNumber,
+            'customer_id'     => $validated['customer_id'],
+            'user_id'         => auth()->id(),
+            'sub_total'       => $validated['sub_total'],
+            'total_discount'  => $validated['total_discount'] ?? 0,
+            'total_charge'    => $validated['total_charge'] ?? 0,
+            'grand_total'     => $validated['grand_total'],
+            'is_paid'         => $validated['is_paid'],
+            'payment_type'    => $validated['payment_type'],
+            'invoice_datetime' => $validated['invoice_datetime'],
+            'created_by'      => auth()->id(),
+        ]);
+
+        foreach ($validated['product_id'] as $key => $productId) {
+            $product = Product::find($productId);
+            InvoiceProduct::create([
+                'invoice_id'   => $invoice->id,
+                'product_id'   => $productId,
+                'product_name' => $product->name,
+                'quantity'     => $validated['quantity'][$key],
+                'price'        => $validated['price'][$key],
+                'total'        => $validated['total'][$key],
+            ]);
+        }
+
+        return redirect()->route('invoice')
+            ->with('success', 'Invoice added successfully!');
     }
-
-
 
     public function edit($id)
     {
         $moduleName = $this->moduleName;
-        $customer = Customer::find($id);
-        return view($this->view . '_form', compact('customer', 'moduleName'));
+        $invoice = Invoice::with('invoice_product')->findOrFail($id);
+        return view($this->view . '_form', compact('invoice', 'moduleName'));
     }
 
     public function update(Request $request, $id)
     {
-        $customer = Customer::findOrFail($id);
+        $invoice = Invoice::with('invoice_product')->findOrFail($id);
 
-        // Validation
-        $request->validate([
-            'name'    => 'required|string|max:255',
-            'mobile'  => 'nullable|string|max:20',
-            'email'   => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'gst'     => 'nullable|string|max:50',
-            'pan'     => 'nullable|string|max:20',
-            'is_active' => 'required|in:1,0',
+        $validated = $request->validate([
+            'customer_id'     => 'required',
+            'invoice_datetime' => 'required|date',
+            'product_id'      => 'required|array|min:1',
+            'product_id.*'    => 'required',
+            'quantity.*'      => 'required|numeric|min:1',
+            'price.*'         => 'required|numeric|min:0',
+            'total.*'         => 'required|numeric|min:0',
+            'sub_total'       => 'required|numeric|min:0',
+            'total_discount'  => 'nullable|numeric|min:0',
+            'total_charge'    => 'nullable|numeric|min:0',
+            'grand_total'     => 'required|numeric|min:0',
+            'payment_type'    => 'required|string',
+            'is_paid'         => 'required|boolean',
         ]);
 
-        $data = [
-            'name'    => $request->name,
-            'mobile'  => $request->mobile,
-            'email'   => $request->email,
-            'address' => $request->address,
-            'gst'     => $request->gst,
-            'pan'     => $request->pan,
-            'is_active' => $request->is_active,
-            'updated_by' => Auth::id(),
-        ];
+        $invoice->update([
+            'customer_id'     => $validated['customer_id'],
+            'sub_total'       => $validated['sub_total'],
+            'total_discount'  => $validated['total_discount'] ?? 0,
+            'total_charge'    => $validated['total_charge'] ?? 0,
+            'grand_total'     => $validated['grand_total'],
+            'is_paid'         => $validated['is_paid'],
+            'payment_type'    => $validated['payment_type'],
+            'invoice_datetime' => $validated['invoice_datetime'],
+            'created_by'      => auth()->id(),
+        ]);
 
-        $customer->update($data);
+        $invoice->invoice_product()->delete();
+
+        foreach ($validated['product_id'] as $key => $productId) {
+            $product = Product::find($productId);
+            $invoice->invoice_product()->create([
+                'product_id'   => $productId,
+                'product_name' => $product->name,
+                'quantity'     => $validated['quantity'][$key],
+                'price'        => $validated['price'][$key],
+                'total'        => $validated['total'][$key],
+            ]);
+        }
 
         return redirect($this->route)->with('success', $this->moduleName . ' updated successfully!');
     }
@@ -139,7 +217,7 @@ class InvoiceController extends Controller
 
     public function delete($id)
     {
-        Customer::find($id)->delete();
+        Invoice::find($id)->delete();
         return redirect($this->route)->with('success', $this->moduleName . ' deleted successfully!');;
     }
 }

@@ -12,7 +12,7 @@
                       <strong>Customize </strong> the overall color scheme, sidebar menu, etc.
                   </div>
 
-                  <h5 class="mt-0 fs-16 fw-bold mb-3">Choose Layout</h5>
+                  <h5 class="mt-0 fs-16 fw-bold mb-1">Choose Layout</h5>
                   <div class="d-flex flex-column gap-2">
                       <div class="form-check form-switch">
                           <input id="customizer-layout01" name="data-layout" type="checkbox" value="vertical" class="form-check-input">

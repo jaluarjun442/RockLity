@@ -25,7 +25,7 @@
                     @method('PUT')
                     <div class="row g-2">
                         <!-- Name -->
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="name" class="form-label">Name</label>
                             <input value="{{ old('name',$user->name) }}"
                                 type="text"
@@ -37,7 +37,7 @@
                         </div>
 
                         <!-- Email -->
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="email" class="form-label">Email</label>
                             <input disabled value="{{ old('email',$user->email) }}"
                                 type="email"
@@ -49,7 +49,7 @@
                         </div>
 
                         <!-- Mobile -->
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="mobile" class="form-label">Mobile</label>
                             <input disabled value="{{ old('mobile',$user->mobile) }}"
                                 type="text"
@@ -64,7 +64,7 @@
                         </div>
 
                         <!-- Password -->
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="password" class="form-label">Password</label>
                             <input type="password"
                                 class="form-control"
@@ -75,7 +75,7 @@
                         </div>
 
                         <!-- Confirm Password -->
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="password_confirmation" class="form-label">Confirm Password</label>
                             <input type="password"
                                 class="form-control"
@@ -84,10 +84,8 @@
                                 placeholder="Confirm Password">
                             <span class="error text-danger">{{ $errors->first('password_confirmation') }}</span>
                         </div>
-
-                        <hr>
                     </div>
-
+                    <hr>
                     <button type="submit" class="btn btn-primary">Save</button>
                     <a href="{{ route('admin.index') }}" class="btn btn-info">Cancel</a>
                 </form>

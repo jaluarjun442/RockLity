@@ -13,6 +13,24 @@ class Invoice extends Model
     protected $table = 'invoice';
     protected $dates = ['deleted_at'];
     protected $guarded = [];
+    protected $fillable = [
+        'invoice_number',
+        'customer_id',
+        'user_id',
+        'sub_total',
+        'total_discount',
+        'total_charge',
+        'grand_total',
+        'is_paid',
+        'payment_type',
+        'description',
+        'invoice_datetime',
+        'created_by',
+        'updated_by',
+        'deleted_at',
+        'created_at',
+        'updated_at',
+    ];
 
     public function customer()
     {
@@ -20,6 +38,6 @@ class Invoice extends Model
     }
     public function invoice_product()
     {
-        return $this->hasMany(Invoice::class, 'product_id', 'id');
+        return $this->hasMany(InvoiceProduct::class, 'invoice_id', 'id');
     }
 }

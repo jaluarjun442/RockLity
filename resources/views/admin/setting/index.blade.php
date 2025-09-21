@@ -24,27 +24,27 @@
                     @csrf()
                     @method('PUT')
                     <div class="row g-2">
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="name" class="form-label">Name</label>
                             <input value="{{ old('name',$setting->name) }}" type="text" class="form-control" id="name" name="name" placeholder="Name">
                             <span class="error text-danger"> {{ $errors->first('name') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="mobile" class="form-label">Mobile</label>
                             <input value="{{ old('mobile',$setting->mobile) }}" type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile">
                             <span class="error text-danger"> {{ $errors->first('mobile') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="email" class="form-label">Email</label>
                             <input value="{{ old('email',$setting->email) }}" type="text" class="form-control" id="email" name="email" placeholder="Email">
                             <span class="error text-danger"> {{ $errors->first('email') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="tagline" class="form-label">Tagline</label>
                             <input value="{{ old('tagline',$setting->tagline) }}" type="text" class="form-control" id="tagline" name="tagline" placeholder="Tagline">
                             <span class="error text-danger"> {{ $errors->first('tagline') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <div class="d-flex align-items-center">
                                 <label for="logo" class="form-label mb-0">Logo</label>
                                 @if(!empty($setting->logo))
@@ -64,7 +64,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="logoModalLabel">Current Logo</h5>
+                                        <h5 class="modal-title" id="logoModalLabel">Logo</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
@@ -74,7 +74,7 @@
                             </div>
                         </div>
                         @endif
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <div class="d-flex align-items-center">
                                 <label for="favicon" class="form-label mb-0">Favicon</label>
                                 @if(!empty($setting->favicon))
@@ -94,7 +94,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="faviconModalLabel">Current Favicon</h5>
+                                        <h5 class="modal-title" id="faviconModalLabel">Favicon</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
@@ -106,22 +106,22 @@
                         @endif
                         <hr>
                         <h5 class=" mb-1 fs-16">Address Details</h5>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="address_line_1" class="form-label">Address Line 1</label>
                             <input value="{{ old('address_line_1',$setting->address_line_1) }}" type="text" class="form-control" id="address_line_1" name="address_line_1" placeholder="Address Line 1">
                             <span class="error text-danger"> {{ $errors->first('address_line_1') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="address_line_2" class="form-label">Address Line 2</label>
                             <input value="{{ old('address_line_2',$setting->address_line_2) }}" type="text" class="form-control" id="address_line_2" name="address_line_2" placeholder="Address Line 2">
                             <span class="error text-danger"> {{ $errors->first('address_line_2') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="city" class="form-label">City</label>
                             <input value="{{ old('city',$setting->city) }}" type="text" class="form-control" id="city" name="city" placeholder="City">
                             <span class="error text-danger"> {{ $errors->first('city') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="state" class="form-label">State</label>
                             <select id="state" name="state" class="form-select">
                                 <option value="">-- Select State --</option>
@@ -164,45 +164,56 @@
                             </select>
                             <span class="error text-danger">{{ $errors->first('state') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="pincode" class="form-label">Pincode</label>
                             <input value="{{ old('pincode',$setting->pincode) }}" type="text" class="form-control" id="pincode" name="pincode" placeholder="Pincode">
                             <span class="error text-danger"> {{ $errors->first('pincode') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                         </div>
                         <hr>
                         <h5 class=" mb-1 fs-16">Tax Details</h5>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="gst" class="form-label">GST (TAX Number)</label>
                             <input value="{{ old('gst',$setting->gst) }}" type="text" class="form-control" id="gst" name="gst" placeholder="GST">
                             <span class="error text-danger"> {{ $errors->first('gst') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="pan" class="form-label">Pan</label>
                             <input value="{{ old('pan',$setting->pan) }}" type="text" class="form-control" id="pan" name="pan" placeholder="Pan">
                             <span class="error text-danger"> {{ $errors->first('pan') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                         </div>
                         <hr>
                         <h5 class=" mb-1 fs-16">Invoice Setting</h5>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="customer_prefix" class="form-label">Customer Prefix</label>
                             <input value="{{ old('customer_prefix',$setting->customer_prefix) }}" type="text" class="form-control" id="customer_prefix" name="customer_prefix" placeholder="Customer Prefix">
                             <span class="error text-danger"> {{ $errors->first('customer_prefix') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="invoice_prefix" class="form-label">Invoice Prefix</label>
                             <input value="{{ old('invoice_prefix',$setting->invoice_prefix) }}" type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" placeholder="Invoice Prefix">
                             <span class="error text-danger"> {{ $errors->first('invoice_prefix') }}</span>
                         </div>
-                        <div class="mb-3 col-md-4">
+                        <div class="mb-1 col-md-4">
                             <label for="invoice_remarks" class="form-label">Invoice Remarks</label>
                             <textarea class="form-control" id="invoice_remarks" name="invoice_remarks">{{$setting->invoice_remarks}}</textarea>
                             <span class="error text-danger"> {{ $errors->first('invoice_remarks') }}</span>
                         </div>
+                        <!-- Select Customer -->
+                        <div class="mb-1 col-md-4">
+                            <label for="default_customer_id" class="form-label">Default Customer</label>
+                            <select class="form-select" id="default_customer_id" name="default_customer_id">
+                                @if($setting->default_customer)
+                                <option value="{{ $setting->default_customer->id }}">{{ $setting->default_customer->name ?? '' }} - {{ $setting->default_customer->mobile ?? '' }}</option>
+                                @endif
+                            </select>
+                            <span class="error text-danger">{{ $errors->first('default_customer_id') }}</span>
+                        </div>
                     </div>
+                    <hr>
                     <button type="submit" class="btn btn-primary">Save</button>
                     <a href="{{ route('admin.index') }}" class="btn btn-info">Cancel</a>
                 </form>
@@ -210,4 +221,39 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+<script>
+    $(document).ready(function() {
+
+        $('#default_customer_id').select2({
+            placeholder: 'Search customer by name or mobile',
+            allowClear: true,
+            ajax: {
+                url: '{{ route("invoice.get_customers_ajax_data") }}',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.name + ' - ' + item.mobile
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+
+    });
+</script>
+
 @endsection

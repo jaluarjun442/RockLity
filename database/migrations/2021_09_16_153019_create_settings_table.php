@@ -28,6 +28,7 @@ class CreateSettingsTable extends Migration
             $table->string('pan')->nullable();
             $table->string('invoice_prefix')->nullable();
             $table->string('customer_prefix')->nullable();
+            $table->integer('default_customer_id')->nullable();
             $table->string('invoice_remarks')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();

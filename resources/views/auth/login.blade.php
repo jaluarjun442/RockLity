@@ -47,16 +47,16 @@
                     @endif
                     <form action="{{ route('login') }}" method="POST">
                         @csrf()
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="emailaddress" class="form-label">Email address</label>
                             <input class="form-control" type="email" name="email" id="email" required="" placeholder="Enter your email">
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <!-- <a href="auth-recoverpw-2.html" class="text-muted float-end"><small>Forgot your password?</small></a> -->
                             <label for="password" class="form-label">Password</label>
                             <input class="form-control" type="password" name="password" required="" id="password" placeholder="Enter your password">
                         </div>
-                        <!-- <div class="mb-3">
+                        <!-- <div class="mb-1">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="checkbox-signin">
                                 <label class="form-check-label" for="checkbox-signin">Remember me</label>

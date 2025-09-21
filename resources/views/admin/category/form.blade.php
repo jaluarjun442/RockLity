@@ -24,17 +24,17 @@
         <form action="{{ route('category.store') }}" method="POST" enctype="multipart/form-data">
           @csrf()
           <div class="row g-2">
-            <div class="mb-3 col-md-4">
+            <div class="mb-1 col-md-4">
               <label for="name" class="form-label">Name</label>
               <input value="{{ old('name','') }}" type="text" class="form-control" id="name" name="name" placeholder="Name">
               <span class="error text-danger"> {{ $errors->first('name') }}</span>
             </div>
-            <div class="mb-3 col-md-4">
+            <div class="mb-1 col-md-4">
               <label for="image" class="form-label">Image</label>
               <input type="file" class="form-control" id="image" name="image" accept="image/*">
               <span class="error text-danger">{{ $errors->first('image') }}</span>
             </div>
-            <div class="mb-3 col-md-4">
+            <div class="mb-1 col-md-4">
               <label for="status" class="form-label">Status</label>
               <select id="status" name="status" class="form-select">
                 <option value="1">Active</option>
@@ -43,6 +43,7 @@
               <span class="error text-danger"> {{ $errors->first('status') }}</span>
             </div>
           </div>
+          <hr>
           <button type="submit" class="btn btn-primary"><i class="ri-edit-line"></i>Add</button>
           <a href="{{ route('category') }}" class="btn btn-info"><i class="ri-close-line"></i>Cancel</a>
         </form>

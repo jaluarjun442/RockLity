@@ -63,8 +63,9 @@ class CustomerController extends Controller
             'pan'     => 'nullable|string|max:20',
             'is_active' => 'required|in:1,0',
         ]);
-        $lastId = Customer::latest('id')->value('id') ?? 0;
-        $customerNumber = Helper::settings()->customer_prefix . ($lastId + 1);
+        $lastId = Customer::max('id');
+        $lastIdPadded = str_pad(($lastId + 1), 6, '0', STR_PAD_LEFT);
+        $customerNumber = Helper::settings()->customer_prefix . ($lastIdPadded);
 
         $data = [
             'customer_number'      => $customerNumber,

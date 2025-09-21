@@ -23,6 +23,7 @@
         <table id="datatable" class="table table-striped dt-responsive nowrap w-100">
           <thead>
             <tr>
+              <th>Number</th>
               <th>Name</th>
               <th>Mobile</th>
               <th>Action</th>
@@ -60,10 +61,10 @@
       //   data: 'id',
       //   name: 'id'
       // },
-      // {
-      //   data: 'image',
-      //   name: 'image'
-      // },
+      {
+        data: 'customer_number',
+        name: 'customer_number'
+      },
       {
         data: 'name',
         name: 'name'

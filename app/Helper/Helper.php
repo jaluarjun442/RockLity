@@ -32,7 +32,7 @@ class Helper
     }
     public static function settings()
     {
-        return Setting::first();
+        return Setting::with(['default_customer'])->where('id', 1)->first();
     }
     public static function dashboard_count_data()
     {

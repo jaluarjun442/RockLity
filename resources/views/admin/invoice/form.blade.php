@@ -25,18 +25,21 @@
         <form action="{{ route('invoice.store') }}" method="POST" id="invoiceForm">
           @csrf
           <div class="row g-2">
-
             <!-- Select Customer -->
-            <div class="mb-3 col-md-6">
+            <div class="mb-1 col-md-6">
               <label for="customer_id" class="form-label">Customer</label>
-              <select class="form-select" id="customer_id" name="customer_id" required></select>
+              <select class="form-select" id="customer_id" name="customer_id" required>
+                @if(Helper::settings()->default_customer)
+                <option value="{{ Helper::settings()->default_customer->id }}">{{ Helper::settings()->default_customer->name ?? '' }} {{ Helper::settings()->default_customer->mobile ? '-'.Helper::settings()->default_customer->mobile : '' }}</option>
+                @endif
+              </select>
               <span class="error text-danger">{{ $errors->first('customer_id') }}</span>
             </div>
-            
-            <div class="mb-3 col-md-3">
-              </div>
+
+            <div class="mb-1 col-md-3">
+            </div>
             <!-- Invoice Date -->
-            <div class="mb-3 col-md-3">
+            <div class="mb-1 col-md-3">
               <label for="invoice_datetime" class="form-label">Invoice Date</label>
               <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" value="{{ date('Y-m-d') }}">
               <span class="error text-danger">{{ $errors->first('invoice_datetime') }}</span>
@@ -128,7 +131,7 @@
             </div> -->
 
           </div>
-
+          <hr>
           <button type="submit" class="btn btn-primary mt-3"><i class="ri-add-line"></i> Add Invoice</button>
           <a href="{{ route('invoice') }}" class="btn btn-secondary mt-3"><i class="ri-close-line"></i> Cancel</a>
         </form>
@@ -157,9 +160,13 @@
         processResults: function(data) {
           return {
             results: $.map(data, function(item) {
+              let text = item.name;
+              if (item.mobile && item.mobile.trim() !== '') {
+                text += ' - ' + item.mobile;
+              }
               return {
                 id: item.id,
-                text: item.name + ' - ' + item.mobile
+                text: text
               };
             })
           };
@@ -229,20 +236,39 @@
       // Initialize Select2 on the new row only
       initProductSelect($('#productsTable tbody tr:last').find('.product_select'));
     });
-
     $(document).on('input', '#total_discount, #total_charge, .total, .quantity, .price', function() {
       let val = $(this).val();
-      val = val.replace(/[^0-9.]/g, '');
+      val = val.replace(/[^0-9.]/g, ''); // remove invalid chars
+
+      // allow empty while typing
       if (val === '' || isNaN(parseFloat(val))) {
-        val = 0;
+        $(this).val('');
+      } else {
+        if ($(this).hasClass('quantity')) {
+          $(this).val(parseFloat(val));
+        } else {
+          $(this).val(val); // keep raw input, format later on blur
+        }
       }
-      if($(this).hasClass('quantity')){
-        $(this).val(parseFloat(val));
-      }else{
-        $(this).val(parseFloat(val).toFixed(2));
-      }
+
       calculateTotals();
     });
+
+    // Format on blur
+    $(document).on('blur', '#total_discount, #total_charge, .total, .price', function() {
+      let val = $(this).val();
+      if (val !== '' && !isNaN(parseFloat(val))) {
+        $(this).val(parseFloat(val).toFixed(2));
+      }
+    });
+
+    $(document).on('blur', '.quantity', function() {
+      let val = $(this).val();
+      if (val !== '' && !isNaN(parseFloat(val))) {
+        $(this).val(parseFloat(val));
+      }
+    });
+
     // Remove product row
     $('#productsTable').on('click', '.removeRow', function() {
       if ($('#productsTable tbody tr').length > 1) {
@@ -251,7 +277,7 @@
       }
     });
 
-    // Calculate totals on quantity change
+    // Calculate totals on quantity or price change
     $('#productsTable').on('input', '.quantity, .price', function() {
       var row = $(this).closest('tr');
       var qty = parseFloat(row.find('.quantity').val()) || 0;
@@ -276,8 +302,9 @@
 
       var discount = parseFloat($('#total_discount').val()) || 0;
       var tax_charge = parseFloat($('#total_charge').val()) || 0;
-      $('#grand_total').val((subTotal - discount + (tax_charge)).toFixed(2));
+      $('#grand_total').val((subTotal - discount + tax_charge).toFixed(2));
     }
+
 
   });
 </script>

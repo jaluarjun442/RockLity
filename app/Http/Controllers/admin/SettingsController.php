@@ -17,7 +17,7 @@ class SettingsController extends Controller
     public function index()
     {
         $moduleName = $this->moduleName;
-        $setting = Setting::find(1);
+        $setting = Setting::with(['default_customer'])->where('id', 1)->first();
         return view($this->view . 'index', compact('setting', 'moduleName'));
     }
 
@@ -49,6 +49,7 @@ class SettingsController extends Controller
             'invoice_prefix' => $request->invoice_prefix,
             'invoice_remarks' => $request->invoice_remarks,
             'customer_prefix' => $request->customer_prefix,
+            'default_customer_id' => $request->default_customer_id ?? null,
         ];
         if ($request->hasFile('logo')) {
             $logo = $request->file('logo');
