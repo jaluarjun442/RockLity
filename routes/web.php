@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\CustomerController;
+use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\InvoiceController;
 use App\Http\Controllers\admin\PaymentController;
 use App\Http\Controllers\admin\ProductController;
@@ -35,7 +36,11 @@ Auth::routes();
 
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
-    Route::view('/', 'admin.index')->name('admin.index');
+    // Route::view('/', 'admin.index')->name('admin.index');
+    Route::group(['prefix' => 'dashboard'], function () {
+        //dashboard routes
+        Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
+    });
     Route::group(['prefix' => 'category'], function () {
         //category routes
         Route::get('/', [CategoryController::class, 'index'])->name('category');

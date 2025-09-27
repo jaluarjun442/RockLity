@@ -17,7 +17,13 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/admin';
+    // public const HOME = '/admin/dashboard';
+    public const HOME = 'admin.index'; // store only the route name
+
+    public static function homeUrl(): string
+    {
+        return route(self::HOME);
+    }
 
     /**
      * The controller namespace for the application.
