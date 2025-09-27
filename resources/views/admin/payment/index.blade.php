@@ -32,8 +32,8 @@
             <input type="text" class="form-control" id="payment_datetime" name="payment_datetime" placeholder="Select date range" value="">
           </div>
           <div class="col-md-1">
-            <label for="is_paid" class="form-label">Method</label>
-            <select class="form-select" id="is_paid">
+            <label for="filter_payment_method" class="form-label">Method</label>
+            <select class="form-select" id="filter_payment_method">
               <option value="">All</option>
               <option value="Cash">Cash</option>
               <option value="Online">Online</option>
@@ -232,7 +232,7 @@
         d.mobile = $('#mobile').val();
         d.customer_id = $('#customer_id').val();
         d.is_paid = $('#is_paid').val();
-        d.payment_type = $('#payment_type').val();
+        d.payment_type = $('#filter_payment_method').val();
       }
     },
     columns: [{

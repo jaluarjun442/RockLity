@@ -52,6 +52,39 @@ class CustomerController extends Controller
         return view($this->view . 'form', compact('moduleName'));
     }
 
+    public function store_popup(Request $request)
+    {
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'mobile'  => 'nullable|string|max:15',
+            'email'   => 'nullable|email|max:255',
+            'address' => 'nullable|string',
+            'gst'     => 'nullable|string|max:20',
+            'pan'     => 'nullable|string|max:20',
+            'is_active' => 'required|in:1,0',
+        ]);
+        $lastId = Customer::max('id');
+        $lastIdPadded = str_pad(($lastId + 1), 6, '0', STR_PAD_LEFT);
+        $customerNumber = Helper::settings()->customer_prefix . ($lastIdPadded);
+        $data = [
+            'customer_number'      => $customerNumber,
+            'name'      => $request->name,
+            'mobile'    => $request->mobile,
+            'email'     => $request->email,
+            'address'   => $request->address,
+            'gst'       => $request->gst,
+            'pan'       => $request->pan,
+            'is_active' => $request->is_active,
+            'created_by' => Auth::id(),
+        ];
+
+        $customer = Customer::create($data);
+        return response()->json([
+            'success' => true,
+            'customer' => $customer,
+            'message' => 'Customer added successfully',
+        ]);
+    }
     public function store(Request $request)
     {
         $request->validate([

@@ -29,6 +29,10 @@ class InvoiceController extends Controller
     public function getData(Request $request)
     {
         $query = Invoice::with('customer');
+        if ($request->due_date) {
+            $date = Carbon::createFromFormat('Y-m-d', $request->due_date);
+            $query->whereDate('due_date', $date);
+        }
         if ($request->invoice_datetime) {
             $dates = explode(' to ', $request->invoice_datetime);
             if (count($dates) === 2) {
@@ -69,6 +73,11 @@ class InvoiceController extends Controller
             ->editColumn('invoice_datetime', function ($row) {
                 return $row->invoice_datetime
                     ? Carbon::parse($row->invoice_datetime)->format('d-m-Y')
+                    : '-';
+            })
+            ->editColumn('due_date', function ($row) {
+                return $row->due_date
+                    ? Carbon::parse($row->due_date)->format('d-m-Y')
                     : '-';
             })
             ->addColumn('action', function ($row) {
@@ -229,15 +238,20 @@ class InvoiceController extends Controller
             'payment_type'    => 'required|string',
             'is_paid'         => 'required|boolean',
         ]);
-
+        $is_paid = $validated['is_paid'];
+        if ($is_paid == false) {
+            $due_date = $validated['due_date'];
+        } else {
+            $due_date = null;
+        }
         $invoice->update([
             'customer_id'     => $validated['customer_id'],
             'sub_total'       => $validated['sub_total'],
             'total_discount'  => $validated['total_discount'] ?? 0,
             'total_charge'    => $validated['total_charge'] ?? 0,
             'grand_total'     => $validated['grand_total'],
-            'is_paid'         => $validated['is_paid'],
-            'due_date'         => $validated['due_date'],
+            'is_paid'         => $is_paid,
+            'due_date'        => $due_date,
             'payment_type'    => $validated['payment_type'],
             'invoice_datetime' => $validated['invoice_datetime'],
             'created_by'      => auth()->id(),
@@ -287,6 +301,7 @@ class InvoiceController extends Controller
         ]);
         if ($request->has('is_full_payment') && $request->is_full_payment == 1) {
             $invoice->update(['is_paid' => 1]);
+            $invoice->update(['due_date' => null]);
         }
         return response()->json(['success' => true]);
     }

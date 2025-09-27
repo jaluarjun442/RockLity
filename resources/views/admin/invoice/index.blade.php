@@ -30,9 +30,13 @@
             <label for="mobile" class="form-label">Mobile</label>
             <input type="text" id="mobile" class="form-control" placeholder="Enter mobile">
           </div>
-          <div class="mb-1 col-md-3">
+          <div class="mb-1 col-md-2">
             <label for="invoice_datetime" class="form-label">Invoice Date</label>
             <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" placeholder="Select date range" value="">
+          </div>
+          <div class="mb-1 col-md-2">
+            <label for="invoice_datetime" class="form-label">Due Date</label>
+            <input type="text" class="form-control" id="due_date" name="due_date" placeholder="Select date" value="">
           </div>
           <div class="col-md-1">
             <label for="is_paid" class="form-label">Paid?</label>
@@ -67,6 +71,7 @@
               <th>Total</th>
               <th>Paid?</th>
               <th>Date</th>
+              <th>Due Date</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -161,6 +166,12 @@
     // maxDate: "today",
     allowInput: true
   });
+  $("#due_date").flatpickr({
+    // mode: "range",
+    dateFormat: "Y-m-d",
+    // maxDate: "today",
+    allowInput: true
+  });
 
   // Select2 for Customer
   $('#customer_id').select2({
@@ -211,6 +222,7 @@
       url: "{{ route('getInvoiceData') }}",
       data: function(d) {
         d.invoice_datetime = $('#invoice_datetime').val();
+        d.due_date = $('#due_date').val();
         d.mobile = $('#mobile').val();
         d.customer_id = $('#customer_id').val();
         d.is_paid = $('#is_paid').val();
@@ -242,6 +254,10 @@
         name: 'invoice_datetime'
       },
       {
+        data: 'due_date',
+        name: 'due_date'
+      },
+      {
         data: 'action',
         name: 'action',
         orderable: false,
@@ -258,6 +274,7 @@
   // Clear filter button click
   $('#clearFilterBtn').on('click', function() {
     $('#invoice_datetime').val('');
+    $('#due_date').val('');
     $('#mobile').val('');
     $('#customer_id').val(null).trigger('change');
     $('#is_paid').val('');

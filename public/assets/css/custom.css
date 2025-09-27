@@ -51,3 +51,6 @@ tr {
     display: inline-block !important;
     min-width: 30px;
 }
+.card-body-dashboard{
+    padding: 0.75rem 0.75rem !important;
+}

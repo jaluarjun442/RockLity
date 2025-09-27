@@ -26,8 +26,11 @@
           @csrf
           <div class="row g-2">
             <!-- Select Customer -->
-            <div class="mb-1 col-md-6">
-              <label for="customer_id" class="form-label">Customer</label>
+            <div class="mb-1 col-md-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="customer_id" class="form-label">Customer</label>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addCustomerModal" class="btn btn-sm btn-outline-primary">+ Add Customer</a>
+              </div>
               <select class="form-select" id="customer_id" name="customer_id" required>
                 @if(Helper::settings()->default_customer)
                 <option value="{{ Helper::settings()->default_customer->id }}">{{ Helper::settings()->default_customer->name ?? '' }} {{ Helper::settings()->default_customer->mobile ? '-'.Helper::settings()->default_customer->mobile : '' }}</option>
@@ -36,7 +39,7 @@
               <span class="error text-danger">{{ $errors->first('customer_id') }}</span>
             </div>
 
-            <div class="mb-1 col-md-3">
+            <div class="mb-1 col-md-5">
             </div>
             <!-- Invoice Date -->
             <div class="mb-1 col-md-3">
@@ -141,6 +144,59 @@
           <a href="{{ route('invoice') }}" class="btn btn-secondary mt-3"><i class="ri-close-line"></i> Cancel</a>
         </form>
       </div>
+    </div>
+  </div>
+</div>
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="quickAddCustomerForm">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCustomerModalLabel">Quick Add Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2">
+            <div class="mb-1 col-md-4">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="mb-1 col-md-4">
+              <label for="mobile" class="form-label">Mobile</label>
+              <input type="text" class="form-control" name="mobile">
+            </div>
+            <div class="mb-1 col-md-4">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" name="email">
+            </div>
+            <div class="mb-1 col-md-4">
+              <label for="gst" class="form-label">GST</label>
+              <input type="text" class="form-control" name="gst">
+            </div>
+            <div class="mb-1 col-md-4">
+              <label for="pan" class="form-label">PAN</label>
+              <input type="text" class="form-control" name="pan">
+            </div>
+            <div class="mb-1 col-md-4">
+              <label for="is_active" class="form-label">Status</label>
+              <select name="is_active" class="form-select">
+                <option value="1" selected>Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+            <div class="mb-1 col-md-12">
+              <label for="address" class="form-label">Address</label>
+              <textarea name="address" rows="2" class="form-control"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add Customer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -324,6 +380,32 @@
         $("#payment_type").val("Cash");
       }
     }
+    $('#quickAddCustomerForm').on('submit', function(e) {
+      e.preventDefault();
+      const formData = $(this).serialize();
+      $.ajax({
+        url: '{{ route("customer.store_popup") }}',
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+          if (response.success) {
+            $('#addCustomerModal').modal('hide');
+            $('#quickAddCustomerForm')[0].reset();
+            const newOption = new Option(response.customer.name + ' - ' + (response.customer.mobile || ''), response.customer.id, true, true);
+            $('#customer_id').append(newOption).trigger('change');
+          } else {
+            alert(response.message || 'Failed to add customer');
+          }
+        },
+        error: function(xhr) {
+          let msg = 'Something went wrong.';
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            msg = xhr.responseJSON.message;
+          }
+          alert(msg);
+        }
+      });
+    });
     $("#is_paid").on("change", function() {
       togglePaymentFields();
     });

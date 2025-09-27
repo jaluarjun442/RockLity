@@ -66,6 +66,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit');
         Route::put('/update/{id}', [CustomerController::class, 'update'])->name('customer.update');
         Route::get('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
+        Route::post('/store_popup', [CustomerController::class, 'store_popup'])->name('customer.store_popup');
     });
 
     Route::group(['prefix' => 'invoice'], function () {
