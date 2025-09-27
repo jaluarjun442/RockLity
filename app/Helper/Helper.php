@@ -5,6 +5,7 @@ namespace App\Helper;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Question;
 use Session;
@@ -40,11 +41,13 @@ class Helper
         $product_count = Product::count();
         $customer_count = Customer::count();
         $invoice_count = Invoice::count();
+        $payment_received_count = Payment::sum('amount');
         return [
             'category_count' => $category_count,
             'product_count' => $product_count,
             'customer_count' => $customer_count,
-            'invoice_count' => $invoice_count
+            'invoice_count' => $invoice_count,
+            'payment_received_count' => $payment_received_count
         ];
     }
 

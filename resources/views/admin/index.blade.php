@@ -1,7 +1,7 @@
 @extends('admin_master')
 @section('content')
 <div class="row row-cols-1 row-cols-xxl-4 row-cols-lg-4 row-cols-md-2 mt-2">
-    <div class="col">
+    <!-- <div class="col">
         <div class="card widget-icon-box">
             <div class="card-body card-body-dashboard">
                 <div class="d-flex justify-content-between">
@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="col">
         <div class="card widget-icon-box">
@@ -64,6 +64,23 @@
                     <div class="avatar-sm flex-shrink-0">
                         <span class="avatar-title text-bg-primary rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
                             <i class="ri-file-text-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card widget-icon-box">
+            <div class="card-body card-body-dashboard">
+                <div class="d-flex justify-content-between">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <h5 class="text-muted text-uppercase fs-13 mt-0" title="Growth">Payment Received</h5>
+                        <h3 class="my-1">{{ Helper::dashboard_count_data()['payment_received_count'] }}</h3>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                        <span class="avatar-title text-bg-primary rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
+                            <i class="ri-money-dollar-circle-line"></i>
                         </span>
                     </div>
                 </div>
