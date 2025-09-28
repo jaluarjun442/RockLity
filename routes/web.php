@@ -42,6 +42,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'],], function () {
         Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
         Route::get('/invoice-chart-data', [DashboardController::class, 'invoiceChartData'])->name('admin.invoice.chart');
         Route::get('/payment-chart-data', [DashboardController::class, 'paymentChartData'])->name('admin.payment.chart');
+        Route::get('/payment-method-chart', [DashboardController::class, 'paymentMethodChartData'])->name('admin.payment.method.chart');
     });
     Route::group(['prefix' => 'category'], function () {
         //category routes

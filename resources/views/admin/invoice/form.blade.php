@@ -43,9 +43,9 @@
             </div>
             <!-- Invoice Date -->
             <div class="mb-1 col-md-3">
-              <label for="invoice_datetime" class="form-label">Invoice Date</label>
-              <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" value="{{ date('Y-m-d') }}">
-              <span class="error text-danger">{{ $errors->first('invoice_datetime') }}</span>
+              <label for="invoice_date" class="form-label">Invoice Date</label>
+              <input type="text" class="form-control" id="invoice_date" name="invoice_date" value="{{ date('Y-m-d') }}">
+              <span class="error text-danger">{{ $errors->first('invoice_date') }}</span>
             </div>
 
             <!-- Products Table -->
@@ -118,19 +118,29 @@
                 <option value="0">No</option>
               </select>
             </div>
-            <div class="col-md-2 payment_type_div">
-              <label for="payment_type" class="form-label">Payment Method</label>
-              <select name="payment_type" id="payment_type" class="form-select">
-                <option value="Cash">Cash</option>
-                <option value="Online">Online</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div class="mb-1 col-md-2 d-none payment_due_date_div">
-              <label for="due_date" class="form-label">Due Date</label>
-              <input type="text" class="form-control" id="due_date" name="due_date" value="{{ date('Y-m-d') }}">
-              <span class="error text-danger">{{ $errors->first('due_date') }}</span>
+
+            <div class="col-md-2 ">
+              <div class="payment_method_div">
+
+                <label for="payment_amount" class="form-label">Payment Amount</label>
+                <input type="text" class="form-control" id="payment_amount" name="payment_amount" value="0">
+
+                <label for="payment_method" class="form-label">Payment Method</label>
+                <select name="payment_method" id="payment_method" class="form-select">
+                  @foreach(\App\Enums\PaymentMethod::values() as $type)
+                  <option value="{{ $type }}">{{ $type }}</option>
+                  @endforeach
+                </select>
+
+              </div>
+              <div class="mb-1 d-none payment_due_date_div">
+                <label for="due_amount" class="form-label">Due Amount</label>
+                <input type="text" class="form-control" id="due_amount" name="due_amount" value="0">
+                <span class="error text-danger">{{ $errors->first('due_amount') }}</span>
+                <label for="due_date" class="form-label">Due Date</label>
+                <input type="text" class="form-control" id="due_date" name="due_date" value="{{ date('Y-m-d') }}">
+                <span class="error text-danger">{{ $errors->first('due_date') }}</span>
+              </div>
             </div>
             <!-- Description -->
             <!-- <div class="col-md-12">
@@ -205,7 +215,7 @@
 @section('script')
 <script>
   $(document).ready(function() {
-    $("#invoice_datetime").flatpickr();
+    $("#invoice_date").flatpickr();
     $("#due_date").flatpickr();
     // Initialize Customer Select2 AJAX
     $('#customer_id').select2({
@@ -365,20 +375,32 @@
       var discount = parseFloat($('#total_discount').val()) || 0;
       var tax_charge = parseFloat($('#total_charge').val()) || 0;
       $('#grand_total').val((subTotal - discount + tax_charge).toFixed(2));
+      $('#payment_amount').val((subTotal - discount + tax_charge).toFixed(2)).trigger('input');
     }
+    $(document).on('input change', '#payment_amount', function() {
+      $('#due_amount').val((parseFloat($('#grand_total').val()) - parseFloat($('#payment_amount').val())).toFixed(2)).trigger('input');
+      togglePaymentFields();
+    });
 
     function togglePaymentFields() {
       let isPaid = $("#is_paid").val();
       if (isPaid == "1") {
-        $(".payment_type_div").removeClass("d-none");
-        $(".payment_due_date_div").addClass("d-none");
+        $(".payment_method_div").removeClass("d-none");
+        if ($('#due_amount').val() > 0) {
+          $(".payment_due_date_div").removeClass("d-none");
+        } else {
+          $(".payment_due_date_div").addClass("d-none");
+        }
         let today = new Date().toISOString().split("T")[0];
         $("#due_date").val(today);
       } else if (isPaid == "0") {
-        $(".payment_type_div").addClass("d-none");
+        $('#payment_amount').val(0);
+        $('#due_amount').val((parseFloat($('#grand_total').val()) - parseFloat($('#payment_amount').val())).toFixed(2)).trigger('input');
+        $(".payment_method_div").addClass("d-none");
         $(".payment_due_date_div").removeClass("d-none");
-        $("#payment_type").val("Cash");
+        $("#payment_method").val("Cash");
       }
+
     }
     $('#quickAddCustomerForm').on('submit', function(e) {
       e.preventDefault();

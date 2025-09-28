@@ -31,11 +31,11 @@
             <input type="text" id="mobile" class="form-control" placeholder="Enter mobile">
           </div>
           <div class="mb-1 col-md-2">
-            <label for="invoice_datetime" class="form-label">Invoice Date</label>
-            <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" placeholder="Select date range" value="">
+            <label for="invoice_date" class="form-label">Invoice Date</label>
+            <input type="text" class="form-control" id="invoice_date" name="invoice_date" placeholder="Select date range" value="">
           </div>
           <div class="mb-1 col-md-2">
-            <label for="invoice_datetime" class="form-label">Due Date</label>
+            <label for="invoice_date" class="form-label">Due Date</label>
             <input type="text" class="form-control" id="due_date" name="due_date" placeholder="Select date" value="">
           </div>
           <div class="col-md-1">
@@ -160,7 +160,7 @@
       }
     });
   });
-  $("#invoice_datetime").flatpickr({
+  $("#invoice_date").flatpickr({
     mode: "range",
     dateFormat: "Y-m-d",
     // maxDate: "today",
@@ -221,12 +221,12 @@
     ajax: {
       url: "{{ route('getInvoiceData') }}",
       data: function(d) {
-        d.invoice_datetime = $('#invoice_datetime').val();
+        d.invoice_date = $('#invoice_date').val();
         d.due_date = $('#due_date').val();
         d.mobile = $('#mobile').val();
         d.customer_id = $('#customer_id').val();
         d.is_paid = $('#is_paid').val();
-        d.payment_type = $('#payment_type').val();
+        d.payment_method = $('#payment_method').val();
       }
     },
     columns: [{
@@ -250,8 +250,8 @@
         name: 'is_paid'
       },
       {
-        data: 'invoice_datetime',
-        name: 'invoice_datetime'
+        data: 'invoice_date',
+        name: 'invoice_date'
       },
       {
         data: 'due_date',
@@ -273,12 +273,12 @@
 
   // Clear filter button click
   $('#clearFilterBtn').on('click', function() {
-    $('#invoice_datetime').val('');
+    $('#invoice_date').val('');
     $('#due_date').val('');
     $('#mobile').val('');
     $('#customer_id').val(null).trigger('change');
     $('#is_paid').val('');
-    $('#payment_type').val('');
+    $('#payment_method').val('');
     table.draw();
   });
 </script>

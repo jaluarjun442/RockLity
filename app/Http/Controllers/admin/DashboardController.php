@@ -76,9 +76,9 @@ class DashboardController extends Controller
             }
         } else {
             // Daily grouping
-            $invoices = \App\Models\Invoice::selectRaw('DATE(invoice_datetime) as date, COUNT(*) as total_count, SUM(grand_total) as total_amount')
-                ->whereRaw("DATE(invoice_datetime) >= ?", [$start->toDateString()])
-                ->whereRaw("DATE(invoice_datetime) <= ?", [$end->toDateString()])
+            $invoices = \App\Models\Invoice::selectRaw('DATE(invoice_date) as date, COUNT(*) as total_count, SUM(grand_total) as total_amount')
+                ->whereRaw("DATE(invoice_date) >= ?", [$start->toDateString()])
+                ->whereRaw("DATE(invoice_date) <= ?", [$end->toDateString()])
                 ->groupBy('date')
                 ->get()
                 ->keyBy('date');
@@ -177,6 +177,61 @@ class DashboardController extends Controller
             'labels' => $labels,
             'paymentCounts' => $paymentCounts,
             'paymentAmounts' => $paymentAmounts
+        ]);
+    }
+    public function paymentMethodChartData(Request $request)
+    {
+        $range = $request->get('range', 'last7days');
+        $start = null;
+        $end = now();
+
+        switch ($range) {
+            case 'today':
+                $start = now()->startOfDay();
+                break;
+            case 'last7days':
+                $start = now()->subDays(6)->startOfDay();
+                break;
+            case 'thismonth':
+                $start = now()->startOfMonth();
+                break;
+            case 'lastmonth':
+                $start = now()->subMonth()->startOfMonth();
+                $end = now()->subMonth()->endOfMonth();
+                break;
+            case 'thisyear':
+                $start = now()->startOfYear();
+                break;
+            case 'lastyear':
+                $start = now()->subYear()->startOfYear();
+                $end = now()->subYear()->endOfYear();
+                break;
+            case 'custom':
+                $start = $request->get('start_date') ? \Carbon\Carbon::parse($request->get('start_date'))->startOfDay() : now()->subDays(6);
+                $end = $request->get('end_date') ? \Carbon\Carbon::parse($request->get('end_date'))->endOfDay() : now();
+                break;
+        }
+
+        // Fetch totals grouped by payment method
+        $payments = \App\Models\Payment::selectRaw('payment_method, SUM(amount) as total_amount')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('payment_method')
+            ->pluck('total_amount', 'payment_method');
+
+        $methods = \App\Enums\PaymentMethod::values();
+
+        $labels = [];
+        $series = [];
+
+        foreach ($methods as $method) {
+            $labels[] = $method;
+            // Force 0 if no data
+            $series[] = isset($payments[$method]) ? (float)$payments[$method] : 0;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'series' => $series
         ]);
     }
 }

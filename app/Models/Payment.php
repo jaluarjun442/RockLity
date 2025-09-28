@@ -19,7 +19,7 @@ class Payment extends Model
         'amount',
         'payment_datetime',
         'remarks',
-        'payment_type',
+        'payment_method',
         'deleted_at',
         'created_at',
         'updated_at',

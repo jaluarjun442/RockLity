@@ -20,7 +20,7 @@ class CreatePaymentTable extends Migration
             $table->decimal('amount', 10, 2)->nullable();
             $table->dateTime('payment_datetime')->nullable()->comment('Payment Date & Time');
             $table->longText('remarks')->nullable();
-            $table->string('payment_type')->default('Cash')->comment('Cash,Online,Cheque,Due,Other');
+            $table->string('payment_method')->default('Cash')->comment('Cash,Online,Cheque,Due,Other');
             $table->softDeletes();
             $table->timestamps();
         });

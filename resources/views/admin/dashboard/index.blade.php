@@ -105,7 +105,7 @@
                                 <option value="lastyear">Last Year</option>
                                 <option value="custom">Custom Range</option>
                             </select>
-                            <input type="text" id="invoice_datetime" class="form-control form-control-sm" style="display:none;" placeholder="Select Date Range">
+                            <input type="text" id="invoice_date" class="form-control form-control-sm" style="display:none;" placeholder="Select Date Range">
                         </div>
                     </div>
                     <div class="card-body">
@@ -141,6 +141,33 @@
             </div>
         </div>
     </div>
+    <div class="col">
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Payment Method Distribution</h5>
+                        <div class="d-flex gap-2">
+                            <select id="payment_method_filter" class="form-select form-select-sm">
+                                <option value="today">Today</option>
+                                <option value="last7days" selected>Last 7 Days</option>
+                                <option value="thismonth">This Month</option>
+                                <option value="lastmonth">Last Month</option>
+                                <option value="thisyear">This Year</option>
+                                <option value="lastyear">Last Year</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <input type="text" id="payment_method_datetime" class="form-control form-control-sm" style="display:none;" placeholder="Select Date Range">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="paymentMethodChart" style="height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -162,7 +189,7 @@
         let paymentFilter = $("#payment_filter").val();
 
         // Flatpickr init
-        $("#invoice_datetime").flatpickr({
+        $("#invoice_date").flatpickr({
             mode: "range",
             dateFormat: "Y-m-d",
             onClose: function(selectedDates, dateStr) {
@@ -271,9 +298,9 @@
         $("#invoice_filter").on("change", function() {
             filter = $(this).val();
             if (filter === "custom") {
-                $("#invoice_datetime").show();
+                $("#invoice_date").show();
             } else {
-                $("#invoice_datetime").hide();
+                $("#invoice_date").hide();
                 loadInvoiceChart(filter);
             }
         });
@@ -389,6 +416,87 @@
             } else {
                 $("#payment_datetime").hide();
                 loadPaymentChart(paymentFilter);
+            }
+        });
+        let paymentMethodChart;
+        let paymentMethodFilter = $("#payment_method_filter").val();
+
+        // Flatpickr for custom range
+        $("#payment_method_datetime").flatpickr({
+            mode: "range",
+            dateFormat: "Y-m-d",
+            onClose: function(selectedDates) {
+                if (paymentMethodFilter === "custom" && selectedDates.length === 2) {
+                    loadPaymentMethodChart("custom", selectedDates[0].toISOString().split('T')[0], selectedDates[1].toISOString().split('T')[0]);
+                }
+            }
+        });
+
+        function loadPaymentMethodChart(range, start = null, end = null) {
+            $.ajax({
+                url: "{{ route('admin.payment.method.chart') }}",
+                data: {
+                    range: range,
+                    start_date: start,
+                    end_date: end
+                },
+                success: function(res) {
+                    if (paymentMethodChart) paymentMethodChart.destroy();
+                    if (res.series.every(val => val === 0)) {
+                        $("#paymentMethodChart").html('<div class="text-center text-muted mt-5">No data available</div>');
+                    } else {
+                        res.series = res.series.map(val => isNaN(val) ? 0 : val);
+                        var options = {
+                            series: res.series,
+                            labels: res.labels,
+                            chart: {
+                                type: 'donut',
+                                height: 350
+                            },
+                            noData: {
+                                text: 'No payment data available',
+                                align: 'center',
+                                verticalAlign: 'middle',
+                                style: {
+                                    color: '#999',
+                                    fontSize: '16px'
+                                }
+                            },
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function(val, opts) {
+                                    return opts.w.config.series[opts.seriesIndex] + " (₹)";
+                                }
+                            },
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                y: {
+                                    formatter: function(val) {
+                                        return "₹" + val;
+                                    }
+                                }
+                            }
+                        };
+                        paymentMethodChart = new ApexCharts(document.querySelector("#paymentMethodChart"), options);
+                        paymentMethodChart.render();
+                    }
+                }
+            });
+        }
+
+        // Initial load
+        loadPaymentMethodChart(paymentMethodFilter);
+
+        // Filter change
+        $("#payment_method_filter").on("change", function() {
+            paymentMethodFilter = $(this).val();
+            if (paymentMethodFilter === "custom") {
+                $("#payment_method_datetime").show();
+            } else {
+                $("#payment_method_datetime").hide();
+                loadPaymentMethodChart(paymentMethodFilter);
             }
         });
 

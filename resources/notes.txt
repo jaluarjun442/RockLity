@@ -1,4 +1,0 @@
-21-09-2025 start - pendind
-ALTER TABLE `settings` ADD `default_customer_id` INT(10) NULL DEFAULT NULL AFTER `customer_prefix`;
-ALTER TABLE `invoice` ADD `due_date` DATE NULL AFTER `invoice_datetime`;
-===

@@ -35,10 +35,9 @@
             <label for="filter_payment_method" class="form-label">Method</label>
             <select class="form-select" id="filter_payment_method">
               <option value="">All</option>
-              <option value="Cash">Cash</option>
-              <option value="Online">Online</option>
-              <option value="Cheque">Cheque</option>
-              <option value="Other">Other</option>
+              @foreach(\App\Enums\PaymentMethod::values() as $type)
+              <option value="{{ $type }}">{{ $type }}</option>
+              @endforeach
             </select>
           </div>
           <div style="margin-top: 2.35rem;" class="mb-1 col-md-2">
@@ -95,11 +94,10 @@
             </div>
             <div class="col-md-3">
               <label>Payment Method</label>
-              <select name="payment_type" id="payment_type" class="form-control" required>
-                <option value="Cash">Cash</option>
-                <option value="Online">Online</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Other">Other</option>
+              <select name="payment_method" id="payment_method" class="form-control" required>
+                @foreach(\App\Enums\PaymentMethod::values() as $type)
+                <option value="{{ $type }}">{{ $type }}</option>
+                @endforeach
               </select>
             </div>
             <div class="col-md-6">
@@ -135,7 +133,7 @@
         // Fill form fields
         $('#payment_id').val(res.id);
         $('#amount').val(res.amount);
-        $('#payment_type').val(res.payment_type);
+        $('#payment_method').val(res.payment_method);
         $('#remarks').val(res.remarks);
 
         // Show modal
@@ -232,7 +230,7 @@
         d.mobile = $('#mobile').val();
         d.customer_id = $('#customer_id').val();
         d.is_paid = $('#is_paid').val();
-        d.payment_type = $('#filter_payment_method').val();
+        d.payment_method = $('#filter_payment_method').val();
       }
     },
     columns: [{
@@ -252,8 +250,8 @@
         name: 'amount'
       },
       {
-        data: 'payment_type',
-        name: 'payment_type'
+        data: 'payment_method',
+        name: 'payment_method'
       },
       {
         data: 'payment_datetime',
@@ -280,7 +278,7 @@
     $('#customer_id').val(null).trigger('change');
     $('#is_paid').val('');
 
-    $('#payment_type').val('');
+    $('#payment_method').val('');
     table.draw();
   });
 </script>

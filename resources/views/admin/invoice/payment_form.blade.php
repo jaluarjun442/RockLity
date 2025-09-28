@@ -27,11 +27,10 @@
             </div>
             <div class="col-md-3">
                 <label>Payment Method</label>
-                <select name="payment_type" class="form-control" required>
-                    <option value="Cash">Cash</option>
-                    <option value="Online">Online</option>
-                    <option value="Cheque">Cheque</option>
-                    <option value="Other">Other</option>
+                <select name="payment_method" class="form-control" required>
+                    @foreach(\App\Enums\PaymentMethod::values() as $type)
+                    <option value="{{ $type }}">{{ $type }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-6">
@@ -70,7 +69,7 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ \Carbon\Carbon::parse($pay->payment_datetime)->format('d-m-Y H:i:s') }}</td>
                 <td>{{ $pay->amount }}</td>
-                <td>{{ ucfirst($pay->payment_type) }}</td>
+                <td>{{ ucfirst($pay->payment_method) }}</td>
                 <td>{{ $pay->remarks }}</td>
             </tr>
             @php $totalCollected += $pay->amount; @endphp

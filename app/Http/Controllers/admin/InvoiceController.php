@@ -33,15 +33,15 @@ class InvoiceController extends Controller
             $date = Carbon::createFromFormat('Y-m-d', $request->due_date);
             $query->whereDate('due_date', $date);
         }
-        if ($request->invoice_datetime) {
-            $dates = explode(' to ', $request->invoice_datetime);
+        if ($request->invoice_date) {
+            $dates = explode(' to ', $request->invoice_date);
             if (count($dates) === 2) {
                 $start = Carbon::createFromFormat('Y-m-d', $dates[0])->startOfDay();
                 $end = Carbon::createFromFormat('Y-m-d', $dates[1])->endOfDay();
-                $query->whereBetween('invoice_datetime', [$start, $end]);
+                $query->whereBetween('invoice_date', [$start, $end]);
             } else {
                 $date = Carbon::createFromFormat('Y-m-d', $dates[0]);
-                $query->whereDate('invoice_datetime', $date);
+                $query->whereDate('invoice_date', $date);
             }
         }
 
@@ -59,8 +59,8 @@ class InvoiceController extends Controller
             $query->where('is_paid', $request->is_paid);
         }
 
-        if ($request->payment_type) {
-            $query->where('payment_type', $request->payment_type);
+        if ($request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
         }
         return Datatables::of($query)
             ->addIndexColumn()
@@ -70,9 +70,9 @@ class InvoiceController extends Controller
             ->addColumn('customer_mobile', function ($row) {
                 return $row->customer ? $row->customer->mobile : '-';
             })
-            ->editColumn('invoice_datetime', function ($row) {
-                return $row->invoice_datetime
-                    ? Carbon::parse($row->invoice_datetime)->format('d-m-Y')
+            ->editColumn('invoice_date', function ($row) {
+                return $row->invoice_date
+                    ? Carbon::parse($row->invoice_date)->format('d-m-Y')
                     : '-';
             })
             ->editColumn('due_date', function ($row) {
@@ -153,7 +153,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'customer_id'     => 'required',
-            'invoice_datetime' => 'required|date',
+            'invoice_date' => 'required|date',
             'product_id'      => 'required|array|min:1',
             'product_id.*'    => 'required',
             'quantity.*'      => 'required|numeric|min:1',
@@ -164,13 +164,20 @@ class InvoiceController extends Controller
             'total_charge'    => 'nullable|numeric|min:0',
             'due_date'        => 'nullable',
             'grand_total'     => 'required|numeric|min:0',
-            'payment_type'    => 'required|string',
+            'payment_amount'  => 'nullable|numeric|min:0',
+            'due_amount'      => 'nullable|numeric|min:0',
+            'payment_method'  => 'nullable|string',
             'is_paid'         => 'required|boolean',
         ]);
 
         $lastId = Invoice::max('id');
         $lastIdPadded = str_pad(($lastId + 1), 6, '0', STR_PAD_LEFT);
         $invoiceNumber = Helper::settings()['invoice_prefix'] . $lastIdPadded;
+        if ($validated['due_amount'] > 0) {
+            $due_date = $validated['due_date'];
+        } else {
+            $due_date = null;
+        }
         $invoice = Invoice::create([
             'invoice_number'  => $invoiceNumber,
             'customer_id'     => $validated['customer_id'],
@@ -178,11 +185,14 @@ class InvoiceController extends Controller
             'sub_total'       => $validated['sub_total'],
             'total_discount'  => $validated['total_discount'] ?? 0,
             'total_charge'    => $validated['total_charge'] ?? 0,
+
+            
             'grand_total'     => $validated['grand_total'],
             'is_paid'         => $validated['is_paid'],
-            'due_date'        => $validated['due_date'],
-            'payment_type'    => $validated['payment_type'],
-            'invoice_datetime' => $validated['invoice_datetime'],
+            'due_date'        => $due_date,
+            'due_amount'        => $validated['due_amount'],
+            'payment_method'    => $validated['payment_method'],
+            'invoice_date' => $validated['invoice_date'],
             'created_by'      => auth()->id(),
         ]);
 
@@ -201,10 +211,10 @@ class InvoiceController extends Controller
             Payment::create([
                 'customer_id'           => $validated['customer_id'],
                 'invoice_id'            => $invoice->id,
-                'amount'                => $validated['grand_total'],
+                'amount'                => $validated['payment_amount'],
                 'payment_datetime'      => Carbon::now(),
                 'remarks'               => 'Payment Received On Invoice Create.',
-                'payment_type'          => $validated['payment_type'],
+                'payment_method'          => $validated['payment_method'],
             ]);
         }
         return redirect()->route('invoice')
@@ -224,7 +234,7 @@ class InvoiceController extends Controller
 
         $validated = $request->validate([
             'customer_id'     => 'required',
-            'invoice_datetime' => 'required|date',
+            'invoice_date' => 'required|date',
             'product_id'      => 'required|array|min:1',
             'product_id.*'    => 'required',
             'quantity.*'      => 'required|numeric|min:1',
@@ -235,7 +245,7 @@ class InvoiceController extends Controller
             'total_charge'    => 'nullable|numeric|min:0',
             'due_date'        => 'nullable',
             'grand_total'     => 'required|numeric|min:0',
-            'payment_type'    => 'required|string',
+            'payment_method'    => 'required|string',
             'is_paid'         => 'required|boolean',
         ]);
         $is_paid = $validated['is_paid'];
@@ -252,8 +262,8 @@ class InvoiceController extends Controller
             'grand_total'     => $validated['grand_total'],
             'is_paid'         => $is_paid,
             'due_date'        => $due_date,
-            'payment_type'    => $validated['payment_type'],
-            'invoice_datetime' => $validated['invoice_datetime'],
+            'payment_method'    => $validated['payment_method'],
+            'invoice_date' => $validated['invoice_date'],
             'created_by'      => auth()->id(),
         ]);
 
@@ -287,7 +297,7 @@ class InvoiceController extends Controller
         $request->validate([
             'invoice_id' => 'required|exists:invoice,id',
             'amount' => 'required|numeric',
-            'payment_type' => 'required|string'
+            'payment_method' => 'required|string'
         ]);
         $invoice = Invoice::findOrFail($request->invoice_id);
 
@@ -297,7 +307,7 @@ class InvoiceController extends Controller
             'amount'                => $request->amount,
             'payment_datetime'      => Carbon::now(),
             'remarks'               => $request->remarks,
-            'payment_type'          => $request->payment_type,
+            'payment_method'          => $request->payment_method,
         ]);
         if ($request->has('is_full_payment') && $request->is_full_payment == 1) {
             $invoice->update(['is_paid' => 1]);

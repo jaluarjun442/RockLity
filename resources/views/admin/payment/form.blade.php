@@ -40,9 +40,9 @@
             </div>
             <!-- Invoice Date -->
             <div class="mb-1 col-md-3">
-              <label for="invoice_datetime" class="form-label">Invoice Date</label>
-              <input type="text" class="form-control" id="invoice_datetime" name="invoice_datetime" value="{{ date('Y-m-d') }}">
-              <span class="error text-danger">{{ $errors->first('invoice_datetime') }}</span>
+              <label for="invoice_date" class="form-label">Invoice Date</label>
+              <input type="text" class="form-control" id="invoice_date" name="invoice_date" value="{{ date('Y-m-d') }}">
+              <span class="error text-danger">{{ $errors->first('invoice_date') }}</span>
             </div>
 
             <!-- Products Table -->
@@ -115,13 +115,12 @@
                 <option value="0">No</option>
               </select>
             </div>
-            <div class="col-md-2 payment_type_div">
-              <label for="payment_type" class="form-label">Payment Method</label>
-              <select name="payment_type" id="payment_type" class="form-select">
-                <option value="Cash">Cash</option>
-                <option value="Online">Online</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Other">Other</option>
+            <div class="col-md-2 payment_method_div">
+              <label for="payment_method" class="form-label">Payment Method</label>
+              <select name="payment_method" id="payment_method" class="form-select">
+                @foreach(\App\Enums\PaymentMethod::values() as $type)
+                <option value="{{ $type }}">{{ $type }}</option>
+                @endforeach
               </select>
             </div>
             <div class="mb-1 col-md-2 d-none payment_due_date_div">
@@ -149,7 +148,7 @@
 @section('script')
 <script>
   $(document).ready(function() {
-    $("#invoice_datetime").flatpickr();
+    $("#invoice_date").flatpickr();
     $("#due_date").flatpickr();
     // Initialize Customer Select2 AJAX
     $('#customer_id').select2({
@@ -314,14 +313,14 @@
     function togglePaymentFields() {
       let isPaid = $("#is_paid").val();
       if (isPaid == "1") {
-        $(".payment_type_div").removeClass("d-none");
+        $(".payment_method_div").removeClass("d-none");
         $(".payment_due_date_div").addClass("d-none");
         let today = new Date().toISOString().split("T")[0];
         $("#due_date").val(today);
       } else if (isPaid == "0") {
-        $(".payment_type_div").addClass("d-none");
+        $(".payment_method_div").addClass("d-none");
         $(".payment_due_date_div").removeClass("d-none");
-        $("#payment_type").val("Cash");
+        $("#payment_method").val("Cash");
       }
     }
     $("#is_paid").on("change", function() {

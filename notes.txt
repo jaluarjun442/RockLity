@@ -1,0 +1,8 @@
+21-09-2025 start - pendind
+ALTER TABLE `settings` ADD `default_customer_id` INT(10) NULL DEFAULT NULL AFTER `customer_prefix`;
+ALTER TABLE `invoice` ADD `due_date` DATE NULL AFTER `invoice_date`;
+===
+ALTER TABLE `invoice` CHANGE `invoice_datetime` `invoice_date` DATE NULL DEFAULT NULL COMMENT 'Invoice Date & Time';
+===
+ALTER TABLE `invoice` CHANGE `payment_type` `payment_method` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Cash' COMMENT 'Cash,Online,Cheque,Other';
+

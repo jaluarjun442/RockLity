@@ -57,9 +57,9 @@ class PaymentController extends Controller
                 $q->where('mobile', 'like', "%{$request->mobile}%");
             });
         }
-        // Filter by payment_type
-        if ($request->payment_type) {
-            $query->where('payment_type', $request->payment_type);
+        // Filter by payment_method
+        if ($request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
         }
 
         return Datatables::of($query)
@@ -81,8 +81,8 @@ class PaymentController extends Controller
             ->addColumn('amount', function ($row) {
                 return $row->amount;
             })
-            ->addColumn('payment_type', function ($row) {
-                return ucfirst($row->payment_type);
+            ->addColumn('payment_method', function ($row) {
+                return ucfirst($row->payment_method);
             })
             ->addColumn('remarks', function ($row) {
                 return $row->remarks ?? '-';
@@ -131,7 +131,7 @@ class PaymentController extends Controller
     {
         $payment = Payment::findOrFail($id);
         $payment->amount = $request->amount;
-        $payment->payment_type = $request->payment_type;
+        $payment->payment_method = $request->payment_method;
         $payment->remarks = $request->remarks;
         $payment->save();
 

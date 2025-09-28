@@ -41,10 +41,10 @@
 
                         <!-- Invoice Date -->
                         <div class="mb-1 col-md-3">
-                            <label for="invoice_datetime" class="form-label">Invoice Date</label>
-                            <input type="text" class="form-control" id="invoice_datetime"
-                                name="invoice_datetime" value="{{ $invoice->invoice_datetime }}">
-                            <span class="error text-danger">{{ $errors->first('invoice_datetime') }}</span>
+                            <label for="invoice_date" class="form-label">Invoice Date</label>
+                            <input type="text" class="form-control" id="invoice_date"
+                                name="invoice_date" value="{{ $invoice->invoice_date }}">
+                            <span class="error text-danger">{{ $errors->first('invoice_date') }}</span>
                         </div>
 
                         <!-- Products Table -->
@@ -110,14 +110,14 @@
                         <div class="col-md-8">
                         </div>
                         <!-- Payment -->
-                        <div class="col-md-2 payment_type_div">
-                            <label for="payment_type" class="form-label">Payment Method</label>
-                            <select name="payment_type" id="payment_type" class="form-select">
-                                <option value="Cash" {{ $invoice->payment_type=='Cash'?'selected':'' }}>Cash</option>
-                                <option value="Online" {{ $invoice->payment_type=='Online'?'selected':'' }}>Online</option>
-                                <option value="Cheque" {{ $invoice->payment_type=='Cheque'?'selected':'' }}>Cheque</option>
-                                <option value="Due" {{ $invoice->payment_type=='Due'?'selected':'' }}>Due</option>
-                                <option value="Other" {{ $invoice->payment_type=='Other'?'selected':'' }}>Other</option>
+                        <div class="col-md-2 payment_method_div">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select name="payment_method" id="payment_method" class="form-select">
+                                @foreach(\App\Enums\PaymentMethod::values() as $type)
+                                <option value="{{ $type }}" {{ $invoice->payment_method === $type ? 'selected' : '' }}>
+                                    {{ $type }}
+                                </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -145,7 +145,7 @@
 @section('script')
 <script>
     $(document).ready(function() {
-        $("#invoice_datetime").flatpickr();
+        $("#invoice_date").flatpickr();
         $("#due_date").flatpickr();
         // Initialize Customer Select2 AJAX
         $('#customer_id').select2({
@@ -306,14 +306,14 @@
         function togglePaymentFields() {
             let isPaid = $("#is_paid").val();
             if (isPaid == "1") {
-                $(".payment_type_div").removeClass("d-none");
+                $(".payment_method_div").removeClass("d-none");
                 $(".payment_due_date_div").addClass("d-none");
                 let today = new Date().toISOString().split("T")[0];
                 $("#due_date").val(today);
             } else if (isPaid == "0") {
-                $(".payment_type_div").addClass("d-none");
+                $(".payment_method_div").addClass("d-none");
                 $(".payment_due_date_div").removeClass("d-none");
-                $("#payment_type").val("Cash");
+                $("#payment_method").val("Cash");
             }
         }
         $("#is_paid").on("change", function() {
