@@ -1,20 +1,25 @@
 <div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <span><strong>Invoice #: </strong> {{ $invoice->invoice_number }}</span>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <span><strong>Total: </strong> {{ $invoice->grand_total }}</span>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <span><strong>Due Amount: </strong> {{ $invoice->due_amount }}</span>
+        </div>
+        @if(!empty($invoice->due_date))
+        <div class="col-md-3">
             <span><strong>Due Date: </strong>
                 {{ \Carbon\Carbon::parse($invoice->due_date)->format('d-m-Y') }}
             </span>
         </div>
+        @endif
     </div>
 
     <hr>
-    @if($invoice->is_paid == 0)
+    @if($invoice->due_amount > 0)
 
     <form id="updatePaymentForm">
         @csrf
@@ -37,12 +42,12 @@
                 <label>Remarks</label>
                 <input type="text" name="remarks" class="form-control" placeholder="Enter remarks (optional)">
             </div>
-            <div class="form-check mt-3" style="margin-left: 10px;">
+            <!-- <div class="form-check mt-3" style="margin-left: 10px;">
                 <input class="form-check-input" type="checkbox" value="1" name="is_full_payment" id="is_full_payment">
                 <label class="form-check-label" for="is_full_payment">
                     Is Full Total Payment Received? (Update Invoice To Paid)
                 </label>
-            </div>
+            </div> -->
         </div>
 
         <div class="mt-3">

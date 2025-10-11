@@ -68,9 +68,10 @@
               <th>Invoice Number</th>
               <th>Customer</th>
               <th>Mobile</th>
-              <th>Total</th>
-              <th>Paid?</th>
               <th>Date</th>
+              <th>Total</th>
+              <!-- <th>Paid?</th> -->
+              <th>Due Amount</th>
               <th>Due Date</th>
               <th>Action</th>
             </tr>
@@ -242,17 +243,21 @@
         name: 'customer_mobile'
       },
       {
+        data: 'invoice_date',
+        name: 'invoice_date'
+      },
+      {
         data: 'grand_total',
         name: 'grand_total'
       },
       {
-        data: 'is_paid',
-        name: 'is_paid'
+        data: 'due_amount',
+        name: 'due_amount'
       },
-      {
-        data: 'invoice_date',
-        name: 'invoice_date'
-      },
+      // {
+      //   data: 'is_paid',
+      //   name: 'is_paid'
+      // },
       {
         data: 'due_date',
         name: 'due_date'

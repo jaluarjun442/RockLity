@@ -80,6 +80,11 @@ class InvoiceController extends Controller
                     ? Carbon::parse($row->due_date)->format('d-m-Y')
                     : '-';
             })
+            ->editColumn('due_amount', function ($row) {
+                return $row->due_amount > 0
+                    ? $row->due_amount
+                    : '-';
+            })
             ->addColumn('action', function ($row) {
                 $editUrl = route('invoice.edit', $row->id);
                 $deleteUrl = route('invoice.delete', $row->id);
@@ -309,7 +314,8 @@ class InvoiceController extends Controller
             'remarks'               => $request->remarks,
             'payment_method'          => $request->payment_method,
         ]);
-        if ($request->has('is_full_payment') && $request->is_full_payment == 1) {
+        $invoice->update(['due_amount' => ($invoice->due_amount - $request->amount)]);
+        if ($request->amount >= $invoice->due_amount) {
             $invoice->update(['is_paid' => 1]);
             $invoice->update(['due_date' => null]);
         }
