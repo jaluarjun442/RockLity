@@ -190,13 +190,11 @@ class InvoiceController extends Controller
             'sub_total'       => $validated['sub_total'],
             'total_discount'  => $validated['total_discount'] ?? 0,
             'total_charge'    => $validated['total_charge'] ?? 0,
-
-            
             'grand_total'     => $validated['grand_total'],
             'is_paid'         => $validated['is_paid'],
             'due_date'        => $due_date,
-            'due_amount'        => $validated['due_amount'],
-            'payment_method'    => $validated['payment_method'],
+            'due_amount'      => $validated['due_amount'],
+            'payment_method'  => $validated['payment_method'],
             'invoice_date' => $validated['invoice_date'],
             'created_by'      => auth()->id(),
         ]);
@@ -236,7 +234,9 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $invoice = Invoice::with('invoice_product')->findOrFail($id);
-
+        if ($invoice->is_paid == 1) {
+            // return redirect($this->route)->with('error', $this->moduleName . ' already Paid this invoice cant be Edit!');
+        }
         $validated = $request->validate([
             'customer_id'     => 'required',
             'invoice_date' => 'required|date',
@@ -248,9 +248,11 @@ class InvoiceController extends Controller
             'sub_total'       => 'required|numeric|min:0',
             'total_discount'  => 'nullable|numeric|min:0',
             'total_charge'    => 'nullable|numeric|min:0',
+            'due_amount'      => 'nullable',
+            'payment_amount'      => 'nullable',
             'due_date'        => 'nullable',
             'grand_total'     => 'required|numeric|min:0',
-            'payment_method'    => 'required|string',
+            'payment_method'  => 'required|string',
             'is_paid'         => 'required|boolean',
         ]);
         $is_paid = $validated['is_paid'];
@@ -261,15 +263,17 @@ class InvoiceController extends Controller
         }
         $invoice->update([
             'customer_id'     => $validated['customer_id'],
+            'user_id'         => auth()->id(),
             'sub_total'       => $validated['sub_total'],
             'total_discount'  => $validated['total_discount'] ?? 0,
             'total_charge'    => $validated['total_charge'] ?? 0,
             'grand_total'     => $validated['grand_total'],
-            'is_paid'         => $is_paid,
+            'is_paid'         => $validated['is_paid'],
             'due_date'        => $due_date,
-            'payment_method'    => $validated['payment_method'],
+            'due_amount'      => $validated['due_amount'],
+            'payment_amount'  => $validated['payment_amount'],
             'invoice_date' => $validated['invoice_date'],
-            'created_by'      => auth()->id(),
+            'updated_by'      => auth()->id(),
         ]);
 
         $invoice->invoice_product()->delete();
@@ -284,7 +288,19 @@ class InvoiceController extends Controller
                 'total'        => $validated['total'][$key],
             ]);
         }
-
+        $edit_amount_received = $validated['payment_amount'] - $invoice->payment->sum('amount');
+        // dd($validated['payment_amount'],$invoice->payment->sum('amount'),$edit_amount_received);
+        if ($validated['is_paid'] == true && $edit_amount_received > 0) {
+            $total_received = $edit_amount_received + $invoice->payment->sum('amount');
+            Payment::create([
+                'customer_id'           => $validated['customer_id'],
+                'invoice_id'            => $invoice->id,
+                'amount'                => $edit_amount_received,
+                'payment_datetime'      => Carbon::now(),
+                'remarks'               => 'Payment Received On Invoice Update. (Old=' . $invoice->payment->sum('amount') . ', Updated:' . $total_received . ')',
+                'payment_method'        => $validated['payment_method'],
+            ]);
+        }
         return redirect($this->route)->with('success', $this->moduleName . ' updated successfully!');
     }
 
@@ -315,7 +331,7 @@ class InvoiceController extends Controller
             'payment_method'          => $request->payment_method,
         ]);
         $invoice->update(['due_amount' => ($invoice->due_amount - $request->amount)]);
-        if ($request->amount >= $invoice->due_amount) {
+        if (0 >= $invoice->due_amount) {
             $invoice->update(['is_paid' => 1]);
             $invoice->update(['due_date' => null]);
         }

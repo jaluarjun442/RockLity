@@ -123,7 +123,7 @@
               <div class="payment_method_div">
 
                 <label for="payment_amount" class="form-label">Payment Amount</label>
-                <input type="text" class="form-control" id="payment_amount" name="payment_amount" value="0">
+                <input type="number" class="form-control" id="payment_amount" name="payment_amount" value="0">
 
                 <label for="payment_method" class="form-label">Payment Method</label>
                 <select name="payment_method" id="payment_method" class="form-select">
@@ -135,7 +135,7 @@
               </div>
               <div class="mb-1 d-none payment_due_date_div">
                 <label for="due_amount" class="form-label">Due Amount</label>
-                <input type="text" class="form-control" id="due_amount" name="due_amount" value="0">
+                <input type="number" class="form-control" id="due_amount" name="due_amount" value="0">
                 <span class="error text-danger">{{ $errors->first('due_amount') }}</span>
                 <label for="due_date" class="form-label">Due Date</label>
                 <input type="text" class="form-control" id="due_date" name="due_date" value="{{ date('Y-m-d') }}">
@@ -308,6 +308,44 @@
       // Initialize Select2 on the new row only
       initProductSelect($('#productsTable tbody tr:last').find('.product_select'));
     });
+
+
+    // Remove product row
+    $('#productsTable').on('click', '.removeRow', function() {
+      if ($('#productsTable tbody tr').length > 1) {
+        $(this).closest('tr').remove();
+        calculateTotals();
+      }
+    });
+
+    $('#quickAddCustomerForm').on('submit', function(e) {
+      e.preventDefault();
+      const formData = $(this).serialize();
+      $.ajax({
+        url: '{{ route("customer.store_popup") }}',
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+          if (response.success) {
+            $('#addCustomerModal').modal('hide');
+            $('#quickAddCustomerForm')[0].reset();
+            const newOption = new Option(response.customer.name + ' - ' + (response.customer.mobile || ''), response.customer.id, true, true);
+            $('#customer_id').append(newOption).trigger('change');
+          } else {
+            alert(response.message || 'Failed to add customer');
+          }
+        },
+        error: function(xhr) {
+          let msg = 'Something went wrong.';
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            msg = xhr.responseJSON.message;
+          }
+          alert(msg);
+        }
+      });
+    });
+
+
     $(document).on('input', '#total_discount, #total_charge, .total, .quantity, .price', function() {
       let val = $(this).val();
       val = val.replace(/[^0-9.]/g, ''); // remove invalid chars
@@ -341,13 +379,6 @@
       }
     });
 
-    // Remove product row
-    $('#productsTable').on('click', '.removeRow', function() {
-      if ($('#productsTable tbody tr').length > 1) {
-        $(this).closest('tr').remove();
-        calculateTotals();
-      }
-    });
 
     // Calculate totals on quantity or price change
     $('#productsTable').on('input', '.quantity, .price', function() {
@@ -402,32 +433,7 @@
       }
 
     }
-    $('#quickAddCustomerForm').on('submit', function(e) {
-      e.preventDefault();
-      const formData = $(this).serialize();
-      $.ajax({
-        url: '{{ route("customer.store_popup") }}',
-        method: 'POST',
-        data: formData,
-        success: function(response) {
-          if (response.success) {
-            $('#addCustomerModal').modal('hide');
-            $('#quickAddCustomerForm')[0].reset();
-            const newOption = new Option(response.customer.name + ' - ' + (response.customer.mobile || ''), response.customer.id, true, true);
-            $('#customer_id').append(newOption).trigger('change');
-          } else {
-            alert(response.message || 'Failed to add customer');
-          }
-        },
-        error: function(xhr) {
-          let msg = 'Something went wrong.';
-          if (xhr.responseJSON && xhr.responseJSON.message) {
-            msg = xhr.responseJSON.message;
-          }
-          alert(msg);
-        }
-      });
-    });
+
     $("#is_paid").on("change", function() {
       togglePaymentFields();
     });

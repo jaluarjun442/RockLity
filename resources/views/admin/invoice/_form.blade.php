@@ -110,31 +110,58 @@
                         <div class="col-md-8">
                         </div>
                         <!-- Payment -->
-                        <div class="col-md-2 payment_method_div">
-                            <label for="payment_method" class="form-label">Payment Method</label>
-                            <select name="payment_method" id="payment_method" class="form-select">
-                                @foreach(\App\Enums\PaymentMethod::values() as $type)
-                                <option value="{{ $type }}" {{ $invoice->payment_method === $type ? 'selected' : '' }}>
-                                    {{ $type }}
-                                </option>
-                                @endforeach
-                            </select>
+                        <!-- Payment -->
+                        <div class="col-md-8">
                         </div>
                         <div class="col-md-2">
-                            <label for="is_paid" class="form-label">Paid</label>
+                            <label for="is_paid" class="form-label">Payment Received?</label>
                             <select name="is_paid" id="is_paid" class="form-select">
-                                <option value="1" {{ $invoice->is_paid ? 'selected':'' }}>Yes</option>
-                                <option value="0" {{ !$invoice->is_paid ? 'selected':'' }}>No</option>
+                                <option value="1" <?php
+                                                    if ($invoice->is_paid == 1) {
+                                                        echo 'selected';
+                                                    }
+                                                    ?>>Yes</option>
+                                <option value="0" <?php
+                                                    if ($invoice->is_paid == 0) {
+                                                        echo 'selected';
+                                                    }
+                                                    ?>>No</option>
                             </select>
                         </div>
-                        <div class="mb-1 col-md-2 d-none payment_due_date_div">
-                            <label for="due_date" class="form-label">Due Date</label>
-                            <input type="text" class="form-control" id="due_date" name="due_date" value="{{ $invoice->due_date }}">
-                            <span class="error text-danger">{{ $errors->first('due_date') }}</span>
+                        <div class="col-md-2 ">
+                            <div class="payment_method_div">
+
+                                <label for="payment_amount" class="form-label">Payment Amount</label>
+                                <input type="hidden" class="form-control" id="hidden_payment_amount" name="hidden_payment_amount" value="{{$invoice['payment']->sum('amount') ?? 0}}">
+                                <input type="number" class="form-control" id="payment_amount" name="payment_amount" value="{{$invoice['payment']->sum('amount') ?? 0}}">
+
+                                <label for="payment_method" class="form-label">Payment Method</label>
+                                <select name="payment_method" id="payment_method" class="form-select">
+                                    @foreach(\App\Enums\PaymentMethod::values() as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                            <div class="mb-1 d-none payment_due_date_div">
+                                <label for="due_amount" class="form-label">Due Amount</label>
+                                <input type="number" class="form-control" id="due_amount" name="due_amount" value="0">
+                                <span class="error text-danger">{{ $errors->first('due_amount') }}</span>
+                                <label for="due_date" class="form-label">Due Date</label>
+                                <input type="text" class="form-control" id="due_date" name="due_date" value="{{ date('Y-m-d') }}">
+                                <span class="error text-danger">{{ $errors->first('due_date') }}</span>
+                            </div>
                         </div>
                     </div>
                     <hr>
-                    <button type="submit" class="btn btn-primary mt-3"><i class="ri-save-line"></i> Update Invoice</button>
+                    @php $is_paid = 0; @endphp
+                    @if($invoice->is_paid == 1)
+                    @php
+                    $is_paid = 0;
+                    echo "<label class='text-danger d-none'>Paid Invoice Can't Edit</label> </br>";
+                    @endphp
+                    @endif
+                    <button @if($is_paid==1) disabled @endif type="submit" class="btn btn-primary mt-3"><i class="ri-save-line"></i> Update Invoice</button>
                     <a href="{{ route('invoice') }}" class="btn btn-secondary mt-3"><i class="ri-close-line"></i> Cancel</a>
                 </form>
             </div>
@@ -217,16 +244,16 @@
         $('#addRow').click(function() {
             // Create a new row HTML manually instead of cloning the existing row
             var newRow = `
-      <tr>
-        <td style="width: 60%;">
-          <select name="product_id[]" class="form-control product_select select2" required></select>
-        </td>
-        <td><input type="number" name="quantity[]" class="form-control quantity" value="1" min="1" required></td>
-        <td><input type="text" name="price[]" class="form-control price" ></td>
-        <td><input type="text" name="total[]" class="form-control total" ></td>
-        <td><button type="button" class="btn btn-danger btn-sm removeRow">-</button></td>
-      </tr>
-    `;
+            <tr>
+                <td style="width: 60%;">
+                <select name="product_id[]" class="form-control product_select select2" required></select>
+                </td>
+                <td><input type="number" name="quantity[]" class="form-control quantity" value="1" min="1" required></td>
+                <td><input type="text" name="price[]" class="form-control price" ></td>
+                <td><input type="text" name="total[]" class="form-control total" ></td>
+                <td><button type="button" class="btn btn-danger btn-sm removeRow">-</button></td>
+            </tr>
+            `;
 
             // Append the new row
             $('#productsTable tbody').append(newRow);
@@ -234,6 +261,14 @@
             // Initialize Select2 on the new row only
             initProductSelect($('#productsTable tbody tr:last').find('.product_select'));
         });
+        // Remove product row
+        $('#productsTable').on('click', '.removeRow', function() {
+            if ($('#productsTable tbody tr').length > 1) {
+                $(this).closest('tr').remove();
+                calculateTotals();
+            }
+        });
+
         $(document).on('input', '#total_discount, #total_charge, .total, .quantity, .price', function() {
             let val = $(this).val();
             val = val.replace(/[^0-9.]/g, ''); // remove invalid chars
@@ -267,13 +302,6 @@
             }
         });
 
-        // Remove product row
-        $('#productsTable').on('click', '.removeRow', function() {
-            if ($('#productsTable tbody tr').length > 1) {
-                $(this).closest('tr').remove();
-                calculateTotals();
-            }
-        });
 
         // Calculate totals on quantity or price change
         $('#productsTable').on('input', '.quantity, .price', function() {
@@ -301,26 +329,44 @@
             var discount = parseFloat($('#total_discount').val()) || 0;
             var tax_charge = parseFloat($('#total_charge').val()) || 0;
             $('#grand_total').val((subTotal - discount + tax_charge).toFixed(2));
+            // $('#payment_amount').val((subTotal - discount + tax_charge).toFixed(2)).trigger('input');
+            $('#payment_amount').val($('#hidden_payment_amount').val()).trigger('input');
         }
+        $(document).on('input change', '#payment_amount', function() {
+            $('#due_amount').val((parseFloat($('#grand_total').val()) - parseFloat($('#payment_amount').val())).toFixed(2)).trigger('input');
+            togglePaymentFields();
+        });
 
         function togglePaymentFields() {
             let isPaid = $("#is_paid").val();
             if (isPaid == "1") {
                 $(".payment_method_div").removeClass("d-none");
-                $(".payment_due_date_div").addClass("d-none");
+                if ($('#due_amount').val() > 0) {
+                    $(".payment_due_date_div").removeClass("d-none");
+                } else {
+                    $(".payment_due_date_div").addClass("d-none");
+                }
                 let today = new Date().toISOString().split("T")[0];
                 $("#due_date").val(today);
             } else if (isPaid == "0") {
+                $('#payment_amount').val($('#hidden_payment_amount').val());
+                $('#due_amount').val((parseFloat($('#grand_total').val()) - parseFloat($('#payment_amount').val())).toFixed(2)).trigger('input');
                 $(".payment_method_div").addClass("d-none");
                 $(".payment_due_date_div").removeClass("d-none");
                 $("#payment_method").val("Cash");
             }
+
         }
+
         $("#is_paid").on("change", function() {
+            console.log(1);
             togglePaymentFields();
         });
         togglePaymentFields();
+        $('#is_paid').trigger('change');
+        $('#payment_amount').trigger('input');
 
+        // calculateTotals();
     });
 </script>
 @endsection
