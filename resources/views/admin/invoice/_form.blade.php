@@ -72,9 +72,9 @@
                                         </td>
                                         <td><input type="number" name="quantity[]" class="form-control quantity"
                                                 value="{{ $product->quantity }}" min="1" required></td>
-                                        <td><input type="text" name="price[]" class="form-control price"
+                                        <td><input type="text" name="price[]" class="form-control price price_field_non_desktop"
                                                 value="{{ number_format($product->price,2) }}"></td>
-                                        <td><input type="text" name="total[]" class="form-control total"
+                                        <td><input type="text" name="total[]" class="form-control total total_field_non_desktop"
                                                 value="{{ number_format($product->total,2) }}"></td>
                                         <td><button type="button" class="btn btn-danger btn-sm removeRow">-</button></td>
                                     </tr>

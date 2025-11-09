@@ -67,8 +67,8 @@
                       <select name="product_id[]" class="form-control product_select select2" required></select>
                     </td>
                     <td><input type="number" name="quantity[]" class="form-control quantity" value="1" min="1" required></td>
-                    <td><input type="text" name="price[]" class="form-control price"></td>
-                    <td><input type="text" name="total[]" class="form-control total"></td>
+                    <td><input type="text" name="price[]" class="form-control price price_field_non_desktop"></td>
+                    <td><input type="text" name="total[]" class="form-control total total_field_non_desktop"></td>
                     <td><button type="button" class="btn btn-danger btn-sm removeRow">-</button></td>
                   </tr>
                 </tbody>
